@@ -695,7 +695,9 @@
   let customIdCtr = 0;
   let currentTab = 1;
   let idCtr = 2000;
-  let discounts = [];
+  let discounts = [
+    { id: 1, type: 'pct', value: 0, label: '', targets: new Set(), targetsCleared: false, collapsed: false }
+  ];
   let discIdCtr = 0;
   let editorCatId = null;
   let priceOverrides = {}; // key -> overridden price
