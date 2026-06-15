@@ -1,0 +1,1678 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Beauty Salon Receipt</title>
+
+  <!-- PWA設定 -->
+  <link rel="manifest" href="./manifest.json">
+  <meta name="theme-color" content="#3d2c1c">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="SalonReceipt">
+
+  <!-- Google Fonts（オンライン時のみ読み込み） -->
+  <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@600;700&family=Noto+Sans+JP:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      /* ─ Light Brown × White Pink × White Gold ─ */
+      --bg:        #2c2018;   /* dark brown page bg  */
+      --bg2:       #352818;   /* slightly lighter    */
+
+      --card:      #f7f0e8;   /* warm ivory card     */
+      --card2:     #f2e8dc;   /* slightly deeper     */
+
+      --pk:        #e8c8c0;   /* soft white pink     */
+      --pk-light:  #f2dcd8;   /* pale blush          */
+      --pk-pale:   #faf2f0;   /* almost white pink   */
+      --pk-dark:   #b87870;   /* dusty rose          */
+      --pk-deep:   #8a5050;   /* deep rose           */
+
+      --gd:        #d4c090;   /* warm white gold     */
+      --gd-light:  var(--gd-light);   /* pale champagne      */
+      --gd-pale:   #f5eedd;   /* ivory gold          */
+      --gd-dark:   #a88850;   /* amber               */
+
+      --br:        #6a4828;   /* brown accent        */
+      --br-light:  #8a6848;   /* light brown         */
+      --br-pale:   #c8a880;   /* pale brown          */
+
+      --cream:     #f7f0e8;   /* warm ivory          */
+      --warm-white:#fdf8f2;   /* card bg             */
+      --charcoal:  #2c1e14;   /* dark brown text     */
+      --mid:       #7a5a40;   /* mid brown text      */
+      --line:      #e0cdb8;   /* warm divider        */
+      --soft:      #f0e4d4;   /* hover               */
+
+      --gold:      var(--gd);
+      --gold-light:var(--gd-light);
+      --gold-dark: var(--gd-dark);
+      --rose:      var(--pk-pale);
+
+      --nav-h: 64px; --header-h: 56px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    html, body { height: 100%; overflow: hidden; }
+    body {
+      font-family: 'Shippori Mincho', serif;
+      color: var(--charcoal);
+      display: flex;
+      flex-direction: column;
+      background: #3d2c1c;
+    }
+
+    /* ── TOP HEADER ── */
+    .top-header {
+      height: var(--header-h); flex-shrink: 0;
+      background: #2e2018; color: #f0e4d0;
+      border-bottom: 1px solid rgba(200,170,110,0.2);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 16px; gap: 10px;
+    }
+    .top-header-title { font-family: 'Shippori Mincho', serif; font-size: 18px; letter-spacing: 0.1em; color: #e4d4a8; }
+    .top-header-right { display: flex; gap: 8px; }
+    .hdr-btn {
+      padding: 6px 12px; border-radius: 6px; border: 1px solid rgba(228,212,168,0.4);
+      background: rgba(228,212,168,0.1); color: #e4d4a8; font-size: 11px;
+      cursor: pointer; font-family: 'Shippori Mincho', serif; white-space: nowrap;
+    }
+    .hdr-btn:active { background: rgba(228,212,168,0.2); }
+    .hdr-btn.gold { border-color: var(--gd-light); color: #e4d4a8; }
+    .hdr-btn.gold:active { background: rgba(228,212,168,0.2); }
+
+    /* ── PAGES ── */
+    .pages { flex: 1; overflow: hidden; position: relative; }
+    .page { position: absolute; inset: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; display: none; background: #3d2c1c; padding-bottom: 24px; }
+    .page.active { display: block; }
+    #page-receipt { background: #3d2c1c !important; }
+
+    /* ── BOTTOM NAV ── */
+    .bottom-nav {
+      height: var(--nav-h); flex-shrink: 0;
+      background: #2e2018; border-top: 1px solid rgba(200,170,110,0.2);
+      display: flex;
+    }
+    .nav-btn {
+      flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 4px; border: none; background: transparent; color: #8a7060;
+      font-size: 10px; font-family: 'Shippori Mincho', serif; cursor: pointer;
+      transition: color 0.15s; padding-bottom: 4px;
+    }
+    .nav-btn svg { width: 22px; height: 22px; }
+    .nav-btn.active { color: #e4d4a8; }
+    .nav-btn.active svg { stroke: #e4d4a8; }
+
+    /* ── RECEIPT INNER TABS ── */
+    .receipt-inner-tabs {
+      display: flex;
+      border-bottom: 1px solid rgba(200,184,152,0.25);
+      background: transparent;
+      flex-shrink: 0;
+    }
+    .ri-tab {
+      flex: 1; padding: 13px 0; border: none; background: transparent;
+      font-family: 'Shippori Mincho', serif; font-size: 14px;
+      color: #8a7060; cursor: pointer; position: relative;
+      transition: color 0.2s; letter-spacing: 0.05em;
+    }
+    .ri-tab.active { color: #f5ede0; font-weight: 700; }
+    .ri-tab.active::after {
+      content: ''; position: absolute; bottom: -1px; left: 20%; right: 20%;
+      height: 2px; background: var(--gd-dark); border-radius: 1px;
+    }
+
+    /* ── SECTION HEADER ── */
+    .sec-header {
+      padding: 20px 16px 12px;
+      font-size: 11px; letter-spacing: 0.2em; color: #e0cdb0; font-weight: 600;
+    }
+
+    /* ── CUSTOMER INFO ── */
+    .card { background: var(--card); border-radius: 12px; margin: 0 12px 12px; padding: 16px; border: 1px solid var(--line); }
+    .card + .card { margin-top: 0; }
+    .field-row { display: flex; flex-direction: column; gap: 5px; padding: 12px 0; border-bottom: 1px solid var(--line); }
+    .field-row:last-child { border-bottom: none; }
+    .field-row label { font-size: 11px; color: #c8b898; letter-spacing: 0.1em; font-weight: 500; }
+    .field-row input { background: transparent; border: none; font-size: 16px; font-family: 'Shippori Mincho', serif; color: var(--charcoal); outline: none; width: 100%; padding: 2px 0; }
+
+    /* ── MENU TABS ── */
+    .menu-tabs-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; padding: 0 12px; margin-bottom: 12px; }
+    .menu-tabs-wrap::-webkit-scrollbar { display: none; }
+    .menu-tabs { display: flex; gap: 0; border-bottom: 1px solid rgba(200,184,152,0.3); white-space: nowrap; min-width: max-content; }
+    .mtab {
+      padding: 10px 16px; font-size: 13px; cursor: pointer; border: none;
+      background: transparent; color: #c8b898; position: relative;
+      font-family: 'Shippori Mincho', serif; transition: color 0.15s;
+    }
+    .mtab::after { content: ''; position: absolute; bottom: -1px; left: 0; right: 0; height: 2px; background: var(--gd-dark); transform: scaleX(0); transition: transform 0.2s; }
+    .mtab.active { color: #f5ede0; font-weight: 700; }
+    .mtab.active::after { transform: scaleX(1); }
+    .mtab-custom { color: #c8b898 !important; }
+
+    .menu-panels { padding: 0 12px; }
+    .mpanel { display: none; }
+    .mpanel.active { display: grid; grid-template-columns: repeat(2,1fr); gap: 10px; }
+    .mpanel.active.flex-col { display: flex; flex-direction: column; gap: 10px; }
+
+    .menu-item {
+      background: var(--card); border: 1px solid var(--line); border-radius: 10px;
+      padding: 14px 12px; cursor: pointer; position: relative; overflow: hidden;
+      transition: border-color 0.15s; active: scale(0.98);
+    }
+    .menu-item::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, var(--gold-light), var(--rose)); opacity: 0; transition: opacity 0.15s; }
+    .menu-item.selected { border-color: var(--gd-dark); background: var(--gd-pale); }
+    .menu-item.selected::before { opacity: 0.1; }
+    .menu-item-name { font-size: 13px; font-weight: 500; margin-bottom: 4px; position: relative; color: var(--charcoal); }
+    .menu-item-price { font-size: 12px; color: var(--br); font-family: 'Shippori Mincho', serif; position: relative; font-weight: 600; }
+    .menu-item-check { position: absolute; top: 8px; right: 8px; width: 18px; height: 18px; border-radius: 50%; background: var(--gd); display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.15s; }
+    .menu-item.selected .menu-item-check { opacity: 1; }
+    .menu-item.selected .menu-item-name { color: var(--charcoal); }
+    .menu-item.selected .menu-item-price { color: var(--br); }
+    .menu-item-check svg { width: 10px; height: 10px; }
+
+    /* custom input */
+    .custom-form { background: #3a2a18; border-radius: 10px; padding: 14px; border: 1px solid var(--line); }
+    .custom-row { display: flex; gap: 8px; align-items: flex-end; }
+    .custom-field { display: flex; flex-direction: column; gap: 4px; }
+    .custom-field label { font-size: 11px; color: #c8b898; font-weight: 500; }
+    .custom-field input { border: none; border-bottom: 1px solid var(--line); font-size: 15px; font-family: 'Shippori Mincho', serif; color: var(--pk-light); outline: none; padding: 6px 0; background: transparent; width: 100%; }
+    .custom-field input:focus { border-bottom-color: var(--pk); }
+    .custom-field.grow { flex: 1; }
+    .custom-field.price { width: 90px; }
+    .custom-add-btn { padding: 10px 14px; background: var(--gold); color: white; border: none; border-radius: 8px; font-size: 13px; cursor: pointer; white-space: nowrap; font-family: 'Shippori Mincho', serif; }
+    .custom-add-btn:active { background: var(--gold-dark); }
+    .custom-items { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+    .custom-item { display: flex; align-items: center; gap: 10px; background: var(--gd-pale); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; }
+    .ci-name { flex: 1; font-size: 13px; color: var(--pk); }
+    .ci-price { font-size: 13px; color: var(--br-light); font-family: 'Shippori Mincho', serif; }
+    .ci-del { border: none; background: none; color: #c8b098; font-size: 20px; padding: 0 4px; cursor: pointer; line-height: 1; }
+
+    /* ── DISCOUNT ── */
+    .disc-section-hdr { display: flex; align-items: center; justify-content: space-between; padding: 20px 16px 12px; }
+    .disc-section-hdr .sec-label { font-size: 11px; letter-spacing: 0.2em; color: #e0cdb0; font-weight: 600; }
+    .btn-add-disc { display: flex; align-items: center; gap: 4px; padding: 7px 13px; border: 1px solid #c8b898; border-radius: 8px; background: rgba(228,212,168,0.15); color: #e0cdb0; font-size: 12px; cursor: pointer; font-family: 'Shippori Mincho', serif; font-weight: 500; }
+    .btn-add-disc:active { background: rgba(228,212,168,0.25); }
+    .discounts-list { display: flex; flex-direction: column; gap: 10px; padding: 0 12px; }
+    .disc-card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+    .disc-card-hdr { display: flex; align-items: center; gap: 8px; padding: 12px 14px; background: var(--gd-pale); border-bottom: 1px solid var(--line); cursor: pointer; }
+    .disc-toggle { font-size: 11px; color: var(--gd); transition: transform 0.2s; flex-shrink: 0; }
+    .disc-card.collapsed .disc-toggle { transform: rotate(-90deg); }
+    .disc-summary { flex: 1; font-size: 13px; color: var(--charcoal); }
+    .disc-summary strong { color: var(--br); }
+    .disc-del { border: none; background: none; font-size: 22px; color: var(--br-pale); padding: 0 4px; cursor: pointer; line-height: 1; }
+    .disc-body { padding: 14px; display: flex; flex-direction: column; gap: 14px; }
+    .disc-card.collapsed .disc-body { display: none; }
+    .disc-type-row { display: flex; gap: 8px; }
+    .disc-pill { flex: 1; padding: 9px 0; border: 1px solid var(--line); border-radius: 20px; background: var(--warm-white); font-size: 12px; cursor: pointer; font-family: 'Shippori Mincho', serif; color: var(--mid); text-align: center; transition: all 0.15s; }
+    .disc-pill.active { border-color: var(--gd-dark); background: var(--gd-light); color: var(--charcoal); font-weight: 600; }
+    .disc-presets { display: flex; flex-wrap: wrap; gap: 6px; }
+    .disc-pre { padding: 5px 12px; border: 1px solid var(--line); border-radius: 14px; background: var(--warm-white); font-size: 12px; cursor: pointer; font-family: 'Shippori Mincho', serif; color: var(--mid); }
+    .disc-pre:active { border-color: var(--gold); color: var(--gold-dark); }
+    .disc-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: end; }
+    .disc-field { display: flex; flex-direction: column; gap: 5px; }
+    .disc-field label { font-size: 11px; color: var(--mid); letter-spacing: 0.1em; font-weight: 500; }
+    .disc-val-row { display: flex; align-items: center; gap: 6px; }
+    .disc-val-row input { flex: 1; min-width: 0; background: transparent; border: none; border-bottom: 1px solid var(--line); padding: 8px 0; font-size: 18px; font-family: 'Shippori Mincho', serif; color: var(--charcoal); outline: none; }
+    .disc-val-row input:focus { border-bottom-color: var(--pk); }
+    .disc-unit { font-size: 14px; color: var(--br); font-family: 'Shippori Mincho', serif; }
+    .disc-name-inp { width: 100%; background: transparent; border: none; border-bottom: 1px solid var(--line); padding: 8px 0; font-size: 14px; font-family: 'Shippori Mincho', serif; color: var(--charcoal); outline: none; }
+    .disc-name-inp:focus { border-bottom-color: var(--gold); }
+    .disc-targets-sec { border-top: 1px solid var(--line); padding-top: 12px; }
+    .disc-targets-hdr { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+    .disc-targets-lbl { font-size: 11px; color: #c8b898; letter-spacing: 0.1em; font-weight: 600; }
+    .disc-targets-btns { display: flex; gap: 6px; }
+    .disc-mini-btn { font-size: 11px; color: var(--br); border: 1px solid var(--gd); border-radius: 10px; background: var(--gd-pale); padding: 3px 10px; cursor: pointer; font-family: 'Shippori Mincho', serif; }
+    .disc-targets-list { display: flex; flex-direction: column; gap: 6px; }
+    .dtarget-row { display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: var(--warm-white); border: 1px solid var(--line); border-radius: 8px; cursor: pointer; }
+    .dtarget-row.checked { border-color: var(--gd-dark); background: var(--gd-pale); }
+    .dtarget-cb { width: 18px; height: 18px; border: 2px solid var(--line); border-radius: 4px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.15s; }
+    .dtarget-row.checked .dtarget-cb { background: var(--gd); border-color: var(--gd); }
+    .dtarget-cb svg { opacity: 0; }
+    .dtarget-row.checked .dtarget-cb svg { opacity: 1; }
+    .dtarget-name { flex: 1; font-size: 13px; color: var(--charcoal); font-weight: 500; }
+    .dtarget-price { font-size: 12px; color: var(--br); font-family: 'Shippori Mincho', serif; font-weight: 600; }
+    .disc-no-items { font-size: 12px; color: var(--br-pale); padding: 4px 0; }
+
+    /* ── RECEIPT PAGE ── */
+    .receipt-card {
+      background: linear-gradient(160deg, var(--gd-pale) 0%, var(--gd-pale) 60%, #d8ece4 100%);
+      color: #1a3528;
+      border-radius: 16px; margin: 12px 12px 0;
+      padding: 24px 20px;
+      box-shadow: 0 4px 20px rgba(30,80,50,0.12);
+      border: 1px solid var(--line);
+    }
+    .r-salon { font-family: 'Shippori Mincho', serif; font-size: 18px; letter-spacing: 0.2em; color: var(--br); text-align: center; margin-bottom: 2px; }
+    .r-sub { font-size: 10px; letter-spacing: 0.25em; color: var(--br-light); text-align: center; margin-bottom: 16px; }
+    .r-divider { border: none; border-top: 1px dashed var(--line); margin: 12px 0; }
+    .r-meta { display: flex; justify-content: space-between; font-size: 11px; color: var(--br-light); margin-bottom: 4px; }
+    .r-customer { font-family: 'Shippori Mincho', serif; font-size: 15px; color: #3e2e1a; letter-spacing: 0.1em; font-weight: 600; }
+    .r-items { margin: 12px 0; min-height: 40px; }
+    .r-item { display: flex; justify-content: space-between; align-items: baseline; padding: 8px 0; border-bottom: 1px solid var(--line); font-size: 13px; }
+    .r-item-name { color: #4a3420; }
+    .r-item-price { color: var(--br); font-family: 'Shippori Mincho', serif; font-weight: 600; }
+    .r-empty { text-align: center; color: var(--br-light); font-size: 12px; padding: 20px 0; }
+    .r-totals { }
+    .r-row { display: flex; justify-content: space-between; padding: 7px 0; font-size: 13px; color: var(--mid); }
+    .r-row.disc { color: var(--pk-dark); font-size: 12px; font-weight: 500; }
+    .r-row.tax { font-size: 12px; color: var(--mid); }
+    .r-grand { display: flex; justify-content: space-between; align-items: baseline; padding: 14px 0 0; border-top: 1px solid var(--line); margin-top: 4px; }
+    .r-grand-label { font-family: 'Shippori Mincho', serif; font-size: 13px; letter-spacing: 0.1em; color: #5a3e22; }
+    .r-grand-amount { font-family: 'Shippori Mincho', serif; font-size: 28px; color: #3e2e1a; }
+    .r-notes { margin: 12px 0 0; padding-top: 12px; border-top: 1px solid var(--line); }
+    .r-notes-lbl { font-size: 10px; color: var(--mid); margin-bottom: 4px; }
+    .r-notes-text { font-size: 12px; color: #4a3420; line-height: 1.7; }
+    .receipt-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 12px 12px 0; }
+    .act-btn { padding: 15px; border: none; border-radius: 10px; font-family: 'Shippori Mincho', serif; font-size: 13px; cursor: pointer; }
+    .act-btn.ghost { background: var(--pk-pale); color: #3e2e1a; border: none; }
+    .act-btn.ghost:active { background: var(--gd-pale); }
+    .act-btn.primary { background: #eaf5f0; color: #3e2e1a; font-weight: 500; box-shadow: 0 2px 8px rgba(100,160,120,0.15); }
+    .act-btn.primary:active { background: var(--gd-light); }
+    .act-btn.span2 { grid-column: span 2; }
+    .receipt-action-note { text-align: center; font-size: 11px; color: #c8b898; padding: 8px 16px 4px; letter-spacing: 0.03em; }
+
+    /* notes textarea */
+    .notes-card { background: var(--card); border-radius: 12px; margin: 0 12px 12px; padding: 16px; border: 1px solid var(--line); }
+    .notes-card textarea { width: 100%; background: transparent; border: none; font-size: 15px; font-family: 'Shippori Mincho', serif; color: var(--pk-light); outline: none; resize: none; min-height: 80px; }
+
+    /* ── MENU EDITOR MODAL ── */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 200; display: none; align-items: flex-end; justify-content: center; }
+    .modal-overlay.open { display: flex; }
+    .modal { background: linear-gradient(180deg, var(--card) 0%, var(--warm-white) 100%); border-radius: 20px 20px 0 0; width: 100%; max-height: 92vh; display: flex; flex-direction: column; }
+    .modal-handle { width: 40px; height: 4px; background: var(--line); border-radius: 2px; margin: 12px auto 4px; flex-shrink: 0; }
+    .modal-header { padding: 8px 20px 14px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; border-bottom: 1px solid var(--line); }
+    .modal-title { font-family: 'Shippori Mincho', serif; font-size: 17px; color: var(--pk); }
+    .modal-close { border: none; background: none; font-size: 24px; color: var(--br-light); cursor: pointer; padding: 4px; line-height: 1; }
+    .modal-body { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
+
+    /* cat list in modal */
+    .modal-cats { flex: 1; overflow-y: auto; padding: 8px 0; }
+    .modal-cat-item { display: flex; align-items: center; padding: 14px 20px; border-bottom: 1px solid var(--line); cursor: pointer; gap: 10px; }
+    .modal-cat-item:active { background: var(--soft); }
+    .modal-cat-name { flex: 1; font-size: 15px; color: var(--pk); }
+    .modal-cat-count { font-size: 12px; color: var(--br-light); }
+    .modal-cat-arrow { color: var(--br-pale); font-size: 14px; }
+    .modal-cat-add { padding: 14px 20px; display: flex; gap: 8px; border-top: 1px solid var(--line); flex-shrink: 0; }
+    .modal-cat-add input { flex: 1; border: 1px solid #5a3e22; border-radius: 8px; padding: 10px 14px; font-size: 14px; font-family: 'Shippori Mincho', serif; outline: none; color: var(--pk-light); background: #3e2e1a; }
+    .modal-cat-add input:focus { border-color: var(--pk); }
+    .modal-cat-add button { padding: 10px 16px; background: var(--gold); color: white; border: none; border-radius: 8px; font-size: 13px; cursor: pointer; font-family: 'Shippori Mincho', serif; }
+
+    /* item editor sub-panel */
+    .item-editor { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
+    .item-editor-header { display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-bottom: 1px solid var(--line); flex-shrink: 0; }
+    .back-btn { border: none; background: none; color: var(--br-light); font-size: 22px; cursor: pointer; padding: 0 4px; line-height: 1; }
+    .cat-name-inp { flex: 1; font-size: 16px; font-weight: 500; font-family: 'Shippori Mincho', serif; border: none; border-bottom: 1px solid transparent; outline: none; background: transparent; color: var(--pk-light); padding: 2px 4px; }
+    .cat-name-inp:focus { border-bottom-color: var(--pk); }
+    .del-cat-btn { font-size: 11px; color: var(--pk-dark); border: 1px solid var(--pk-light); border-radius: 6px; background: var(--pk-pale); padding: 5px 10px; cursor: pointer; font-family: 'Shippori Mincho', serif; white-space: nowrap; }
+    .item-list { flex: 1; overflow-y: auto; padding: 8px 16px; display: flex; flex-direction: column; gap: 8px; background: #3a2a18; }
+    .editor-item { display: flex; align-items: center; gap: 8px; background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 12px; }
+    .editor-item input { border: none; background: transparent; font-family: 'Shippori Mincho', serif; font-size: 14px; color: var(--pk-light); outline: none; }
+    .ei-name { flex: 1; }
+    .ei-yen { font-size: 13px; color: var(--gold-dark); }
+    .ei-price { width: 80px; text-align: right; font-family: 'Shippori Mincho', serif; color: var(--gold-dark); }
+    .ei-del { border: none; background: none; font-size: 22px; color: #c8b098; cursor: pointer; padding: 0 4px; line-height: 1; flex-shrink: 0; }
+    .ei-del:active { color: var(--pk); }
+    .item-add-row { padding: 12px 16px; border-top: 1px solid #5a3e22; display: flex; gap: 8px; align-items: center; flex-shrink: 0; background: #3a2a18; }
+    .item-add-row input { border: 1px solid #5a3e22; border-radius: 8px; padding: 10px 12px; font-size: 14px; font-family: 'Shippori Mincho', serif; outline: none; color: var(--pk-light); background: #3e2e1a; }
+    .item-add-row input:focus { border-color: var(--pk); }
+    .ai-name { flex: 1; }
+    .ai-price { width: 100px; }
+    .item-add-row button { padding: 10px 14px; background: var(--gold); color: white; border: none; border-radius: 8px; font-size: 13px; cursor: pointer; font-family: 'Shippori Mincho', serif; white-space: nowrap; }
+    .empty-msg { text-align: center; color: var(--mid); font-size: 13px; padding: 24px; }
+
+    /* ── HISTORY ── */
+    .sec-label-inline { font-size: 11px; letter-spacing: 0.2em; color: #e0cdb0; font-weight: 600; }
+    .hist-clear-btn { font-size: 11px; color: var(--br-light); border: 1px solid #5a3e22; border-radius: 8px; background: #3e2e1a; padding: 6px 12px; cursor: pointer; font-family: 'Shippori Mincho', serif; }
+    .hist-card {
+      background: var(--card); border: 1px solid var(--line); border-radius: 14px;
+      overflow: hidden; cursor: pointer; transition: box-shadow 0.15s;
+    }
+    .hist-card:active { box-shadow: 0 4px 16px rgba(201,169,110,0.15); }
+    .hist-card-header { padding: 14px 16px 10px; display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+    .hist-card-info { flex: 1; }
+    .hist-card-customer { font-size: 15px; font-weight: 500; color: var(--pk-light); margin-bottom: 3px; }
+    .hist-card-date { font-size: 11px; color: var(--br-light); letter-spacing: 0.05em; }
+    .hist-card-total { font-family: 'Shippori Mincho', serif; font-size: 20px; color: var(--gd-light); text-align: right; white-space: nowrap; }
+    .hist-card-items { padding: 0 16px 10px; display: flex; flex-wrap: wrap; gap: 5px; }
+    .hist-tag { font-size: 11px; background: var(--gd-pale); color: var(--br); border-radius: 10px; padding: 3px 10px; }
+    .hist-card-footer { border-top: 1px solid var(--line); display: flex; }
+    .hist-action-btn { flex: 1; padding: 11px; border: none; background: transparent; font-size: 12px; cursor: pointer; font-family: 'Shippori Mincho', serif; transition: background 0.15s; }
+    .hist-action-btn:active { background: #3e2e1a; }
+    .hist-action-btn.load { color: var(--br-light); border-right: 1px solid #5a3e22; }
+    .hist-action-btn.del { color: #c04040; }
+    /* ── HISTORY TABS ── */
+    .hist-tab-row { display: flex; border-bottom: 1px solid rgba(200,184,152,0.2); margin-bottom: 0; }
+    .hist-tab { flex: 1; padding: 12px 0; border: none; background: transparent; font-family: 'Shippori Mincho', serif; font-size: 13px; color: #8a7060; cursor: pointer; position: relative; transition: color 0.2s; letter-spacing: 0.05em; }
+    .hist-tab.active { color: #e0cdb0; font-weight: 600; }
+    .hist-tab.active::after { content: ''; position: absolute; bottom: -1px; left: 20%; right: 20%; height: 2px; background: var(--gd-dark); border-radius: 1px; }
+    .pdf-card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+    .pdf-card-header { padding: 12px 14px 8px; }
+    .pdf-card-name { font-size: 14px; font-weight: 600; color: var(--charcoal); margin-bottom: 3px; }
+    .pdf-card-date { font-size: 11px; color: var(--mid); }
+    .pdf-card-size { font-size: 11px; color: var(--br-pale); float: right; }
+    .pdf-card-footer { border-top: 1px solid var(--line); display: flex; }
+    .pdf-action-btn { flex: 1; padding: 11px; border: none; background: transparent; font-size: 12px; cursor: pointer; font-family: 'Shippori Mincho', serif; transition: background 0.15s; }
+    .pdf-action-btn:active { background: var(--soft); }
+    .pdf-action-btn.download { color: var(--br); border-right: 1px solid var(--line); }
+    .pdf-action-btn.del { color: var(--pk-dark); }
+
+    /* ── HISTORY SEARCH ── */
+    .hist-search-wrap { padding: 0 12px 12px; }
+    .hist-search-box {
+      display: flex; align-items: center; gap: 8px;
+      background: #3e2e1a; border: 1px solid var(--line); border-radius: 12px;
+      padding: 10px 14px; transition: border-color 0.2s;
+    }
+    .hist-search-box:focus-within { border-color: var(--gd); box-shadow: 0 0 0 3px var(--gd-pale); }
+    .hist-search-icon { width: 16px; height: 16px; color: var(--br-light); flex-shrink: 0; }
+    .hist-search-input {
+      flex: 1; border: none; outline: none; font-size: 15px;
+      font-family: 'Shippori Mincho', serif; color: var(--pk-light);
+      background: transparent;
+    }
+    .hist-search-input::placeholder { color: #4a3820; }
+    .hist-search-clear {
+      border: none; background: none; font-size: 18px; color: #d0b8c0;
+      cursor: pointer; padding: 0 2px; line-height: 1; flex-shrink: 0;
+    }
+    .hist-search-clear:active { color: var(--pk-dark); }
+    .hist-result-count { font-size: 11px; color: var(--br-light); padding: 0 16px 8px; }
+
+    .hist-saved-badge { position: fixed; bottom: calc(var(--nav-h) + 16px); left: 50%; transform: translateX(-50%); background: var(--charcoal); color: white; font-size: 13px; padding: 10px 22px; border-radius: 20px; z-index: 300; opacity: 0; transition: opacity 0.3s; pointer-events: none; white-space: nowrap; }
+    .hist-saved-badge.show { opacity: 1; }
+    .act-btn.save-btn { background: var(--pk); color: #3e2e1a; border: none; }
+    .act-btn.save-btn:active { background: var(--gd); }
+
+    /* ── DRAG & SORT ── */
+    .drag-handle {
+      display: flex; align-items: center; justify-content: center;
+      width: 28px; height: 100%; flex-shrink: 0;
+      color: #d8c8b8; cursor: grab; touch-action: none;
+      font-size: 16px; padding: 0 2px; letter-spacing: -2px; line-height: 1;
+      user-select: none; -webkit-user-select: none;
+    }
+    .drag-handle:active { cursor: grabbing; }
+    .editor-item.dragging {
+      opacity: 0.4; border: 2px dashed var(--gd) !important;
+      background: var(--gd-pale) !important;
+    }
+    .editor-item.drag-over {
+      border-color: var(--gd) !important;
+      box-shadow: 0 0 0 2px var(--gd-pale);
+    }
+
+    /* ── DESKTOP override ── */
+    @media (min-width: 768px) {
+      html, body { overflow: auto; height: auto; }
+      body { flex-direction: row; align-items: stretch; }
+      .top-header { display: none; }
+      .bottom-nav { display: none; }
+      .pages { flex: 1; overflow: auto; position: static; }
+      .page { position: static; display: none; overflow: visible; padding-bottom: 0; }
+      .page.active { display: block; }
+      /* show all pages side by side on desktop */
+      .pages { display: grid; grid-template-columns: 1fr 400px; gap: 0; }
+      .page#page-input { display: block; border-right: 1px solid var(--line); overflow-y: auto; height: 100vh; }
+      .page#page-receipt { display: block; background: #3d2c1c;
+      height: 100vh; overflow-y: auto; padding: 0; }
+      .page#page-receipt .receipt-card { border-radius: 0; margin: 0; background: transparent; }
+      .page#page-receipt .receipt-actions { margin: 0 0 24px; padding: 0 20px; }
+      .page#page-discount, .page#page-notes { display: none !important; }
+      .receipt-card { padding: 40px 32px 24px; }
+      .modal-overlay { align-items: center; }
+      .modal { border-radius: 16px; max-width: 560px; max-height: 80vh; }
+    }
+
+    .r-item-price-tap { cursor: pointer; border-bottom: 1px dashed var(--gd-light); transition: color 0.15s; padding-bottom: 1px; }
+    .r-item-price-tap:active { color: white; }
+    .r-item-price-tap.overridden { color: var(--gd-dark); }
+    .price-edited-dot { font-size: 7px; vertical-align: super; color: var(--pk-light); }
+    .r-price-input { background: transparent; border: none; border-bottom: 2px solid var(--gd); color: #3e2e1a; font-family: "Shippori Mincho", serif; font-size: 16px; text-align: right; width: 90px; outline: none; padding: 2px 0; -moz-appearance: textfield; }
+    .r-price-input::-webkit-outer-spin-button, .r-price-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+    @media print {
+      html, body { overflow: visible; height: auto; background: white; }
+      .top-header, .bottom-nav, .left-panel, .pages > *:not(#page-receipt), .receipt-actions, .modal-overlay { display: none !important; }
+      .page#page-receipt { display: block !important; background: white !important; }
+      .receipt-card { background: white !important; color: black !important; border-radius: 0; margin: 0; padding: 24px; }
+      .r-salon { color: var(--br) !important; } .r-sub, .r-meta { color: #aaa !important; }
+      .r-divider { border-color: #ddd !important; } .r-customer { color: black !important; }
+      .r-item { border-color: #eee !important; } .r-item-name { color: #555 !important; }
+      .r-item-price { color: var(--br) !important; } .r-row { color: #666 !important; }
+      .r-grand { border-color: #ddd !important; } .r-grand-label { color: var(--br) !important; }
+      .r-grand-amount { color: black !important; }
+    }
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+
+<!-- TOP HEADER -->
+<div class="top-header">
+  <div class="top-header-title">Beauty Salon Receipt</div>
+  <div class="top-header-right"></div>
+</div>
+
+<!-- PAGES -->
+<div class="pages">
+
+  <!-- PAGE: INPUT (メニュー＋割引タブ統合) -->
+  <div class="page active" id="page-input">
+
+    <!-- hidden inputs for compatibility -->
+    <input type="hidden" id="customerName" value="">
+    <input type="hidden" id="staffName" value="">
+    <input type="hidden" id="visitDate" value="">
+
+    <!-- タブ -->
+    <div class="receipt-inner-tabs">
+      <button class="ri-tab active" id="ri-tab-menu" onclick="switchReceiptTab('menu')">メニュー</button>
+      <button class="ri-tab" id="ri-tab-disc" onclick="switchReceiptTab('disc')">％ 割引</button>
+    </div>
+
+    <!-- メニューパネル -->
+    <div id="ri-panel-menu">
+      <div class="menu-tabs-wrap"><div class="menu-tabs" id="menuTabs"></div></div>
+      <div class="menu-panels" id="menuPanels"></div>
+    </div>
+
+    <!-- 割引パネル -->
+    <div id="ri-panel-disc" style="display:none;">
+      <div class="disc-section-hdr">
+        <div class="sec-label">▸ 割引設定</div>
+        <button class="btn-add-disc" onclick="addDiscount()">＋ 割引を追加</button>
+      </div>
+      <div id="discounts-list" class="discounts-list"></div>
+      <div id="discounts-empty" style="font-size:13px;color:#d0a0b8;text-align:center;padding:32px 16px;">「＋ 割引を追加」で割引を設定できます</div>
+    </div>
+  </div>
+
+  <!-- PAGE: DISCOUNT (後方互換用・非表示) -->
+  <div id="page-discount" style="display:none;"></div>
+
+  <!-- PAGE: NOTES -->
+  <textarea id="notes" style="display:none;"></textarea>
+
+  <!-- PAGE: SETTINGS -->
+  <div class="page" id="page-settings">
+    <div class="sec-header">▸ 店舗・スタッフ設定</div>
+    <div class="card">
+      <div class="field-row">
+        <label>店舗名（伝票に表示）</label>
+        <input type="text" id="settingSalonName" placeholder="BEAUTY SALON" oninput="onSettingChange()">
+      </div>
+      <div class="field-row">
+        <label>サブテキスト</label>
+        <input type="text" id="settingSalonSub" placeholder="ご来店ありがとうございます" oninput="onSettingChange()">
+      </div>
+    </div>
+    <div class="sec-header" style="margin-top:8px;">▸ 担当者</div>
+    <div class="card">
+      <div class="field-row" style="border-bottom:none;">
+        <label>担当者名（デフォルト）</label>
+        <input type="text" id="settingStaffName" placeholder="柳生" oninput="onSettingChange()">
+      </div>
+    </div>
+    <div style="padding:8px 16px;">
+      <p style="font-size:11px;color:#b09888;line-height:1.7;">※ 担当者名は伝票ページの「担当スタッフ」欄で都度変更できます。ここで設定した名前が初期値になります。</p>
+    </div>
+    <div class="sec-header" style="margin-top:8px;">▸ メニュー管理</div>
+    <div class="card">
+      <div class="field-row" style="border-bottom:none;flex-direction:row;align-items:center;justify-content:space-between;">
+        <span style="font-size:14px;">メニューを編集する</span>
+        <button class="hdr-btn" style="background:var(--cream);border-color:var(--line);color:var(--mid);" onclick="openMenuEditor()">編集を開く</button>
+      </div>
+    </div>
+
+    <!-- 履歴セクション -->
+    <div class="sec-header" style="margin-top:8px;">▸ 伝票履歴</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:0 12px 8px;">
+      <div style="font-size:11px;color:#c8b898;"></div>
+      <button class="hist-clear-btn" onclick="clearAllHistory()">全て削除</button>
+    </div>
+    <div class="hist-search-wrap">
+      <div class="hist-search-box">
+        <svg class="hist-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>
+        <input type="text" id="histSearchInput" class="hist-search-input" placeholder="お客様名で検索..." oninput="renderHistoryList()">
+        <button class="hist-search-clear" id="histSearchClear" onclick="clearHistSearch()" style="display:none;">×</button>
+      </div>
+    </div>
+    <div id="history-list" style="padding:0 12px;display:flex;flex-direction:column;gap:10px;"></div>
+    <div id="history-empty" style="text-align:center;color:#c8b098;font-size:13px;padding:32px 24px;line-height:2;">
+      保存された伝票はありません<br>
+      <span style="font-size:11px;">伝票ページの「保存」ボタンで履歴に追加できます</span>
+    </div>
+    <div id="history-noresult" style="display:none;text-align:center;color:#c8b098;font-size:13px;padding:32px 24px;line-height:2;">
+      「<span id="hist-search-term"></span>」の検索結果はありません
+    </div>
+  </div>
+
+  <!-- PAGE: RECEIPT -->
+  <div class="page" id="page-receipt">
+    <div class="receipt-card">
+      <div class="r-salon" id="r-salon">BEAUTY SALON</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+        <div class="r-sub" id="r-sub" style="margin-bottom:0;">ご来店ありがとうございます</div>
+        <div id="r-staff" style="font-size:12px;color:var(--mid);font-family:'Shippori Mincho',serif;white-space:nowrap;"></div>
+      </div>
+      <hr class="r-divider">
+      <div id="r-date" style="text-align:center;font-size:12px;color:var(--mid);font-family:'Shippori Mincho',serif;letter-spacing:0.1em;padding:4px 0 8px;"></div>
+      <hr class="r-divider">
+      <div class="r-items" id="r-items"><div class="r-empty">メニューを選択してください</div></div>
+      <div class="r-totals">
+        <hr class="r-divider">
+        <div id="r-disc-rows"></div>
+        <div class="r-row disc r-disc-total" id="r-disc-total-row" style="display:none;border-top:1px solid #a8d8bc;padding-top:10px;">
+          <span>割引合計</span><span id="r-disc-total">−¥0</span>
+        </div>
+        <div class="r-row"><span>小計</span><span id="r-subtotal">¥0</span></div>
+        <div class="r-row tax"><span>消費税（10%）</span><span id="r-tax">¥0</span></div>
+        <div class="r-grand">
+          <div class="r-grand-label">合計（税込）</div>
+          <div class="r-grand-amount" id="r-total">¥0</div>
+        </div>
+      </div>
+
+    </div>
+    <div class="receipt-actions" style="grid-template-columns:1fr 1fr;">
+      <button class="act-btn ghost span2" onclick="resetAll()">リセット</button>
+      <button class="act-btn save-btn span2" onclick="saveToHistory()">💾 伝票を履歴に保存</button>
+    </div>
+  </div>
+
+  <!-- PAGE: HISTORY -->
+  <div class="page" id="page-history">
+    <!-- 伝票履歴 -->
+    <div id="panel-history">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:20px 16px 12px;">
+        <div class="sec-label-inline">▸ 伝票履歴</div>
+        <button class="hist-clear-btn" onclick="clearAllHistory()">全て削除</button>
+      </div>
+      <div class="hist-search-wrap">
+        <div class="hist-search-box">
+          <svg class="hist-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>
+          <input type="text" id="histSearchInput" class="hist-search-input" placeholder="お客様名で検索..." oninput="renderHistoryList()">
+          <button class="hist-search-clear" id="histSearchClear" onclick="clearHistSearch()" style="display:none;">×</button>
+        </div>
+      </div>
+      <div id="history-list" style="padding:0 12px;display:flex;flex-direction:column;gap:10px;"></div>
+      <div id="history-empty" style="text-align:center;color:#c8b098;font-size:13px;padding:48px 24px;line-height:2;">
+        保存された伝票はありません<br>
+        <span style="font-size:11px;">伝票ページの「保存」ボタンで履歴に追加できます</span>
+      </div>
+      <div id="history-noresult" style="display:none;text-align:center;color:#c8b098;font-size:13px;padding:48px 24px;line-height:2;">
+        「<span id="hist-search-term"></span>」の検索結果はありません
+      </div>
+    </div>
+
+
+  </div>
+
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <button class="nav-btn" data-page="page-receipt" onclick="switchPage(this);updateReceipt()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#c0a0a8" stroke-width="1.8"><path d="M4 4h16v16H4z"/><line x1="8" y1="9" x2="16" y2="9"/><line x1="8" y1="13" x2="13" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/></svg>
+    見積伝票
+  </button>
+  <button class="nav-btn active" data-page="page-input" onclick="switchPage(this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,220,210,0.55)" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="3"/><line x1="8" y1="9" x2="16" y2="9"/><line x1="8" y1="13" x2="14" y2="13"/></svg>
+    メニュー
+  </button>
+
+
+  <button class="nav-btn" data-page="page-settings" onclick="switchPage(this);renderHistoryList()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#c0a0a8" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    設定
+  </button>
+</div>
+
+<!-- MENU EDITOR MODAL -->
+<div class="modal-overlay" id="editorOverlay" onclick="overlayClick(event)">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <div class="modal-title" id="editorTitle">メニュー編集</div>
+      <button class="modal-close" onclick="closeEditor()">×</button>
+    </div>
+    <div class="modal-body" id="editorBody"></div>
+  </div>
+</div>
+
+<script>
+  // ===== STATE =====
+  let menuData = [
+    { id: 1, name: 'カット', items: [
+      { id: 101, name: 'Cut', price: 4200 },
+      { id: 102, name: 'Shampoo＋Blow', price: 2500 },
+      { id: 103, name: '前髪Cut', price: 800 },
+      { id: 104, name: '学生Cut', price: 3200 },
+      { id: 105, name: '小学生Cut', price: 2500 },
+      { id: 106, name: '子ども', price: 2000 },
+      { id: 107, name: '子どもShampoo', price: 500 },
+    ]},
+    { id: 2, name: 'カラー', items: [
+      { id: 201, name: '全体Collar', price: 5500 },
+      { id: 202, name: 'リタッチCollar', price: 4500 },
+      { id: 203, name: '部分Collar', price: 2500 },
+      { id: 204, name: 'Bleach', price: 6000 },
+      { id: 205, name: 'Foil', price: 500 },
+      { id: 206, name: 'その他Collar', price: 3000 },
+    ]},
+    { id: 3, name: 'パーマ', items: [
+      { id: 301, name: 'Perm', price: 9000 },
+      { id: 302, name: 'ツイストPerm', price: 10000 },
+      { id: 303, name: '特殊Perm', price: 11000 },
+      { id: 304, name: 'デジタルPerm', price: 13000 },
+      { id: 305, name: '縮毛矯正', price: 19000 },
+      { id: 306, name: 'アイロンStraightPerm', price: 15000 },
+      { id: 307, name: 'StraightPerm', price: 12000 },
+      { id: 308, name: '前髪StraightPerm', price: 6000 },
+      { id: 309, name: 'その他Perm', price: 4000 },
+    ]},
+    { id: 4, name: 'トリートメント', items: [
+      { id: 401, name: 'ScalpシャンプーTreatment', price: 1200 },
+      { id: 402, name: 'ハホニコTreatment', price: 2000 },
+      { id: 403, name: '１weekTreatment', price: 2500 },
+      { id: 404, name: 'ラメラメTreatment', price: 3500 },
+      { id: 405, name: 'レブリTreatment', price: 4000 },
+      { id: 406, name: 'インボーン（インフェノム）Treatment', price: 4500 },
+      { id: 407, name: 'Head-Spa', price: 3000 },
+      { id: 408, name: 'Scalpシャンプー＆Head-Spa', price: 4000 },
+    ]},
+    { id: 5, name: 'その他', items: [
+      { id: 501, name: 'Eyebrow', price: 500 },
+      { id: 502, name: 'Set-Up', price: 4000 },
+      { id: 503, name: 'Make-Up', price: 3000 },
+      { id: 504, name: 'リラク', price: 500 },
+    ]},
+  ];
+  let selectedIds = new Set();
+  let customItems = [];
+  let customIdCtr = 0;
+  let currentTab = 1;
+  let idCtr = 2000;
+  let discounts = [];
+  let discIdCtr = 0;
+  let editorCatId = null;
+  let priceOverrides = {}; // key -> overridden price
+  let settings = {
+    salonName: 'BEAUTY SALON',
+    salonSub: 'ご来店ありがとうございます',
+    staffName: '柳生',
+  };
+
+  // ===== INIT =====
+  document.getElementById('visitDate').value = new Date().toISOString().split('T')[0];
+  // Apply saved settings to fields
+  document.getElementById('staffName').value = settings.staffName;
+  document.getElementById('settingSalonName').value = settings.salonName;
+  document.getElementById('settingSalonSub').value = settings.salonSub;
+  document.getElementById('settingStaffName').value = settings.staffName;
+  renderMenuTabs();
+  renderDiscountsList();
+  updateReceipt();
+
+  // ===== NAV =====
+  function switchPage(btn) {
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(btn.dataset.page).classList.add('active');
+  }
+
+  // ===== SETTINGS =====
+  function onSettingChange() {
+    const name = document.getElementById('settingSalonName').value.trim();
+    const sub = document.getElementById('settingSalonSub').value.trim();
+    const staff = document.getElementById('settingStaffName').value.trim();
+    settings.salonName = name || 'BEAUTY SALON';
+    settings.salonSub = sub || 'ご来店ありがとうございます';
+    settings.staffName = staff || '柳生';
+    // Sync default staff to staffName input if user hasn't changed it
+    const staffInput = document.getElementById('staffName');
+    if (!staffInput._userEdited) {
+      staffInput.value = settings.staffName;
+    }
+    updateReceipt();
+  }
+
+  // ===== MENU TABS =====
+  function renderMenuTabs() {
+    const tabsEl = document.getElementById('menuTabs');
+    const panelsEl = document.getElementById('menuPanels');
+    tabsEl.innerHTML = '';
+    panelsEl.innerHTML = '';
+
+    menuData.forEach(cat => {
+      const tab = document.createElement('button');
+      tab.className = 'mtab' + (currentTab === cat.id ? ' active' : '');
+      tab.textContent = cat.name;
+      tab.onclick = () => { currentTab = cat.id; renderMenuTabs(); };
+      tabsEl.appendChild(tab);
+
+      const panel = document.createElement('div');
+      panel.className = 'mpanel' + (currentTab === cat.id ? ' active' : '');
+      cat.items.forEach(item => {
+        const el = document.createElement('div');
+        el.className = 'menu-item' + (selectedIds.has(item.id) ? ' selected' : '');
+        el.innerHTML = `
+          <div class="menu-item-check"><svg viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.8" stroke-linecap="round"/></svg><\/div>
+          <div class="menu-item-name">${item.name}<\/div>
+          <div class="menu-item-price">¥${item.price.toLocaleString()}<\/div>`;
+        el.onclick = () => {
+          selectedIds.has(item.id) ? selectedIds.delete(item.id) : selectedIds.add(item.id);
+          el.classList.toggle('selected');
+          updateReceipt();
+          renderDiscountsList();
+        };
+        panel.appendChild(el);
+      });
+      panelsEl.appendChild(panel);
+    });
+
+    // Custom tab
+    const ctab = document.createElement('button');
+    ctab.className = 'mtab mtab-custom' + (currentTab === 'custom' ? ' active' : '');
+    ctab.textContent = '＋ 手入力';
+    ctab.onclick = () => { currentTab = 'custom'; renderMenuTabs(); };
+    tabsEl.appendChild(ctab);
+
+    const cpanel = document.createElement('div');
+    cpanel.className = 'mpanel flex-col' + (currentTab === 'custom' ? ' active' : '');
+    cpanel.innerHTML = `
+      <div class="custom-form">
+        <div class="custom-row">
+          <div class="custom-field grow">
+            <label>メニュー名<\/label>
+            <input type="text" id="customName" placeholder="例）ケアブリーチ">
+          <\/div>
+          <div class="custom-field price">
+            <label>金額（税別）<\/label>
+            <input type="number" id="customPrice" placeholder="0" min="0">
+          <\/div>
+          <button class="custom-add-btn" onclick="addCustomItem()">追加<\/button>
+        <\/div>
+        <div class="custom-items" id="customItemsList"><\/div>
+        <div id="customEmpty" style="text-align:center;color:#d0a0b8;font-size:12px;padding:12px 0;${customItems.length > 0 ? 'display:none;' : ''}">メニューを追加してください<\/div>
+      <\/div>`;
+    panelsEl.appendChild(cpanel);
+    renderCustomItems();
+  }
+
+  function addCustomItem() {
+    const n = document.getElementById('customName');
+    const p = document.getElementById('customPrice');
+    if (!n || !p) return;
+    const name = n.value.trim(), price = parseInt(p.value) || 0;
+    if (!name || price <= 0) { n.style.borderBottomColor = 'var(--pk)'; setTimeout(() => n.style.borderBottomColor = '', 800); return; }
+    customItems.push({ id: ++customIdCtr, name, price });
+    n.value = ''; p.value = '';
+    renderCustomItems();
+    updateReceipt();
+    renderDiscountsList();
+  }
+
+  function removeCustomItem(id) {
+    customItems = customItems.filter(i => i.id !== id);
+    renderCustomItems();
+    updateReceipt();
+    renderDiscountsList();
+  }
+
+  function renderCustomItems() {
+    const list = document.getElementById('customItemsList');
+    const empty = document.getElementById('customEmpty');
+    if (!list) return;
+    list.innerHTML = '';
+    if (empty) empty.style.display = customItems.length === 0 ? 'block' : 'none';
+    customItems.forEach(item => {
+      const row = document.createElement('div');
+      row.className = 'custom-item';
+      row.innerHTML = `<span class="ci-name">${item.name}<\/span><span class="ci-price">¥${item.price.toLocaleString()}<\/span><button class="ci-del" onclick="removeCustomItem(${item.id})">×<\/button>`;
+      list.appendChild(row);
+    });
+  }
+
+  // ===== HELPERS =====
+  function getSelectedItems() {
+    const res = [];
+    menuData.forEach(cat => cat.items.forEach(it => {
+      if (selectedIds.has(it.id)) {
+        const key = 'm' + it.id;
+        res.push({ key, name: it.name, price: priceOverrides[key] !== undefined ? priceOverrides[key] : it.price, basePrice: it.price });
+      }
+    }));
+    customItems.forEach(it => {
+      const key = 'c' + it.id;
+      res.push({ key, name: it.name, price: priceOverrides[key] !== undefined ? priceOverrides[key] : it.price, basePrice: it.price });
+    });
+    return res;
+  }
+
+  // ===== DISCOUNTS =====
+  function addDiscount() {
+    const all = getSelectedItems();
+    discounts.push({ id: ++discIdCtr, type: 'pct', value: 0, label: '', targets: new Set(all.map(i => i.key)), targetsCleared: false, collapsed: false });
+    renderDiscountsList();
+    updateReceipt();
+  }
+
+  function removeDiscount(id) {
+    discounts = discounts.filter(d => d.id !== id);
+    renderDiscountsList();
+    updateReceipt();
+  }
+
+  function toggleDisc(id) {
+    const d = discounts.find(d => d.id === id);
+    if (d) { d.collapsed = !d.collapsed; renderDiscountsList(); }
+  }
+
+  function renderDiscountsList() {
+    const container = document.getElementById('discounts-list');
+    const empty = document.getElementById('discounts-empty');
+    const allItems = getSelectedItems();
+    const validKeys = new Set(allItems.map(i => i.key));
+    container.innerHTML = '';
+    empty.style.display = discounts.length === 0 ? 'block' : 'none';
+
+    discounts.forEach(disc => {
+      for (const k of disc.targets) { if (!validKeys.has(k)) disc.targets.delete(k); }
+      if (disc.targets.size === 0 && allItems.length > 0 && !disc.targetsCleared) allItems.forEach(i => disc.targets.add(i.key));
+
+      const tTotal = allItems.filter(it => disc.targets.has(it.key)).reduce((s, it) => s + it.price, 0);
+      let amt = 0;
+      if (disc.type === 'pct' && disc.value > 0) amt = Math.round(tTotal * disc.value / 100);
+      else if (disc.type === 'yen' && disc.value > 0) amt = Math.min(disc.value, tTotal);
+      const lbl = disc.label || (disc.type === 'pct' ? (disc.value ? disc.value + '% 割引' : '割引') : (amt ? '¥' + amt.toLocaleString() + ' 引き' : '割引'));
+      const summaryHTML = amt > 0 ? `<strong>${lbl}<\/strong>&nbsp; −¥${amt.toLocaleString()}` : `<span style="color:#d0a0b8;">${lbl || '設定中...'}<\/span>`;
+
+      const card = document.createElement('div');
+      card.className = 'disc-card' + (disc.collapsed ? ' collapsed' : '');
+
+      // Header
+      const hdr = document.createElement('div');
+      hdr.className = 'disc-card-hdr';
+      hdr.innerHTML = `<span class="disc-toggle">▼<\/span><span class="disc-summary">${summaryHTML}<\/span><button class="disc-del">×<\/button>`;
+      hdr.querySelector('.disc-toggle').onclick = () => toggleDisc(disc.id);
+      hdr.querySelector('.disc-summary').onclick = () => toggleDisc(disc.id);
+      hdr.querySelector('.disc-del').onclick = e => { e.stopPropagation(); removeDiscount(disc.id); };
+      card.appendChild(hdr);
+
+      // Body
+      const body = document.createElement('div');
+      body.className = 'disc-body';
+
+      // Type
+      const typeRow = document.createElement('div');
+      typeRow.className = 'disc-type-row';
+      [['pct','％ 割引'],['yen','円引き']].forEach(([t, l]) => {
+        const p = document.createElement('button');
+        p.className = 'disc-pill' + (disc.type === t ? ' active' : '');
+        p.textContent = l;
+        p.onclick = () => { disc.type = t; disc.value = 0; renderDiscountsList(); updateReceipt(); };
+        typeRow.appendChild(p);
+      });
+      body.appendChild(typeRow);
+
+      // Presets
+      const preRow = document.createElement('div');
+      preRow.className = 'disc-presets';
+      (disc.type === 'pct' ? [10,25,30,50] : [1000,2000,7500]).forEach(v => {
+        const b = document.createElement('button');
+        b.className = 'disc-pre';
+        b.textContent = disc.type === 'pct' ? v + '%' : '¥' + v.toLocaleString();
+        b.onclick = () => { disc.value = v; renderDiscountsList(); updateReceipt(); };
+        preRow.appendChild(b);
+      });
+      body.appendChild(preRow);
+
+      // Fields
+      const fields = document.createElement('div');
+      fields.className = 'disc-fields';
+      const vf = document.createElement('div'); vf.className = 'disc-field';
+      vf.innerHTML = `<label>${disc.type === 'pct' ? '割引率' : '割引額'}<\/label>`;
+      const vr = document.createElement('div'); vr.className = 'disc-val-row';
+      const vi = document.createElement('input'); vi.type = 'text'; vi.inputMode = 'numeric'; vi.pattern = '[0-9]*'; vi.placeholder = '0'; vi.value = disc.value || '';
+      vi.oninput = () => { disc.value = parseFloat(vi.value.replace(/[^0-9.]/g, '')) || 0; updateReceipt(); refreshSummary(card, disc, allItems); };
+      const vu = document.createElement('span'); vu.className = 'disc-unit'; vu.textContent = disc.type === 'pct' ? '%' : '円';
+      vr.appendChild(vi); vr.appendChild(vu); vf.appendChild(vr);
+      const nf = document.createElement('div'); nf.className = 'disc-field';
+      nf.innerHTML = '<label>割引名称<\/label>';
+      const ni = document.createElement('input'); ni.className = 'disc-name-inp'; ni.placeholder = '例）会員割引'; ni.value = disc.label;
+      ni.oninput = () => { disc.label = ni.value; updateReceipt(); refreshSummary(card, disc, allItems); };
+      nf.appendChild(ni);
+      // 名称プリセット
+      const namePreRow = document.createElement('div');
+      namePreRow.className = 'disc-presets';
+      namePreRow.style.marginTop = '8px';
+      ['次回予約割引', '紹介割引', 'Tr.＆SPAセット割引', '50％OFF上限割引'].forEach(name => {
+        const b = document.createElement('button');
+        b.className = 'disc-pre';
+        b.textContent = name;
+        b.onclick = () => { disc.label = name; ni.value = name; updateReceipt(); refreshSummary(card, disc, allItems); };
+        namePreRow.appendChild(b);
+      });
+      nf.appendChild(namePreRow);
+      fields.appendChild(vf); fields.appendChild(nf);
+      body.appendChild(fields);
+
+      // Targets
+      const ts = document.createElement('div'); ts.className = 'disc-targets-sec';
+      const th = document.createElement('div'); th.className = 'disc-targets-hdr';
+      const tLbl = document.createElement('span'); tLbl.className = 'disc-targets-lbl'; tLbl.textContent = '割引対象';
+      const tBtns = document.createElement('div'); tBtns.className = 'disc-targets-btns';
+      const allBtn = document.createElement('button'); allBtn.className = 'disc-mini-btn'; allBtn.textContent = 'すべて';
+      allBtn.onclick = () => { disc.targetsCleared = false; allItems.forEach(i => disc.targets.add(i.key)); renderDiscountsList(); updateReceipt(); };
+      const noneBtn = document.createElement('button'); noneBtn.className = 'disc-mini-btn'; noneBtn.textContent = '解除';
+      noneBtn.onclick = () => { disc.targetsCleared = true; disc.targets.clear(); renderDiscountsList(); updateReceipt(); };
+      tBtns.appendChild(allBtn); tBtns.appendChild(noneBtn);
+      th.appendChild(tLbl); th.appendChild(tBtns);
+      ts.appendChild(th);
+      if (allItems.length === 0) {
+        const msg = document.createElement('div'); msg.className = 'disc-no-items'; msg.textContent = 'メニューを選択すると対象を絞れます';
+        ts.appendChild(msg);
+      } else {
+        const tl = document.createElement('div'); tl.className = 'disc-targets-list';
+        allItems.forEach(item => {
+          const checked = disc.targets.has(item.key);
+          const row = document.createElement('div');
+          row.className = 'dtarget-row' + (checked ? ' checked' : '');
+          row.innerHTML = `<div class="dtarget-cb"><svg width="9" height="7" viewBox="0 0 9 7" fill="none"><path d="M1 3.5l2.5 2.5 4.5-5" stroke="white" stroke-width="1.8" stroke-linecap="round"/></svg><\/div><span class="dtarget-name">${item.name}<\/span><span class="dtarget-price">¥${item.price.toLocaleString()}<\/span>`;
+          row.onclick = () => { if (disc.targets.has(item.key)) { disc.targets.delete(item.key); } else { disc.targetsCleared = false; disc.targets.add(item.key); } renderDiscountsList(); updateReceipt(); };
+          tl.appendChild(row);
+        });
+        ts.appendChild(tl);
+      }
+      body.appendChild(ts);
+      card.appendChild(body);
+      container.appendChild(card);
+    });
+  }
+
+  function refreshSummary(card, disc, allItems) {
+    const tTotal = allItems.filter(it => disc.targets.has(it.key)).reduce((s, it) => s + it.price, 0);
+    let amt = 0;
+    if (disc.type === 'pct' && disc.value > 0) amt = Math.round(tTotal * disc.value / 100);
+    else if (disc.type === 'yen' && disc.value > 0) amt = Math.min(disc.value, tTotal);
+    const lbl = disc.label || (disc.type === 'pct' ? (disc.value ? disc.value + '% 割引' : '割引') : (amt ? '¥' + amt.toLocaleString() + ' 引き' : '割引'));
+    const el = card.querySelector('.disc-summary');
+    if (el) el.innerHTML = amt > 0 ? `<strong>${lbl}<\/strong>&nbsp; −¥${amt.toLocaleString()}` : `<span style="color:#d0a0b8;">${lbl || '設定中...'}<\/span>`;
+  }
+
+  // ===== RECEIPT =====
+  function updateReceipt() {
+    const notes = document.getElementById('notes').value;
+    // Update salon info from settings
+    const rSalon = document.getElementById('r-salon');
+    const rSub = document.getElementById('r-sub');
+    if (rSalon) rSalon.textContent = settings.salonName;
+    if (rSub) rSub.textContent = settings.salonSub;
+    const rStaff = document.getElementById('r-staff');
+    if (rStaff) {
+      const staffName = document.getElementById('staffName').value || settings.staffName || '';
+      rStaff.textContent = staffName ? '担当：' + staffName : '';
+    }
+    // 日付表示（スマホの内蔵時計を使用・オフラインでも正確）
+    const rDate = document.getElementById('r-date');
+    if (rDate) {
+      const now = new Date();
+      const y = now.getFullYear();
+      const m = now.getMonth() + 1;
+      const d = now.getDate();
+      const wdays = ['日', '月', '火', '水', '木', '金', '土'];
+      const w = wdays[now.getDay()];
+      rDate.textContent = y + '年' + m + '月' + d + '日（' + w + '）';
+    }
+
+    const allItems = getSelectedItems();
+    const container = document.getElementById('r-items');
+    const taggedKeys = new Set();
+    discounts.forEach(d => { if (d.value > 0) d.targets.forEach(k => taggedKeys.add(k)); });
+
+    if (allItems.length === 0) {
+      container.innerHTML = '<div class="r-empty">メニューを選択してください<\/div>';
+    } else {
+      container.innerHTML = '';
+      allItems.forEach(item => {
+        const tagged = taggedKeys.has(item.key);
+        const isOverridden = priceOverrides[item.key] !== undefined;
+        const div = document.createElement('div');
+        div.className = 'r-item';
+
+        const nameSpan = document.createElement('span');
+        nameSpan.className = 'r-item-name';
+        nameSpan.innerHTML = item.name + (tagged ? ' <span style="font-size:9px;background:var(--gd-dark);color:white;border-radius:3px;padding:1px 5px;vertical-align:middle;">割引<\/span>' : '');
+
+        const priceSpan = document.createElement('span');
+        priceSpan.className = 'r-item-price r-item-price-tap' + (isOverridden ? ' overridden' : '');
+        priceSpan.title = 'タップで金額を編集';
+        priceSpan.innerHTML = '¥' + item.price.toLocaleString() + (isOverridden ? ' <span class="price-edited-dot">●<\/span>' : '');
+        priceSpan.onclick = () => startPriceEdit(item.key, item.price, item.basePrice, priceSpan);
+
+        div.appendChild(nameSpan);
+        div.appendChild(priceSpan);
+        container.appendChild(div);
+      });
+    }
+
+    const baseTotal = allItems.reduce((s, it) => s + it.price, 0);
+
+    const discRowsEl = document.getElementById('r-disc-rows');
+    discRowsEl.innerHTML = '';
+    let totalDisc = 0, remaining = baseTotal;
+    const validKeys = new Set(allItems.map(i => i.key));
+
+    discounts.forEach(disc => {
+      for (const k of disc.targets) { if (!validKeys.has(k)) disc.targets.delete(k); }
+      if (disc.targets.size === 0 && allItems.length > 0 && !disc.targetsCleared) allItems.forEach(i => disc.targets.add(i.key));
+      const tTotal = allItems.filter(it => disc.targets.has(it.key)).reduce((s, it) => s + it.price, 0);
+      let amt = 0;
+      if (disc.type === 'pct' && disc.value > 0) amt = Math.round(tTotal * disc.value / 100);
+      else if (disc.type === 'yen' && disc.value > 0) amt = Math.min(disc.value, tTotal);
+      amt = Math.min(amt, remaining);
+      if (amt <= 0) return;
+      totalDisc += amt; remaining -= amt;
+      const lbl = disc.label || (disc.type === 'pct' ? disc.value + '% 割引' : '割引');
+      const row = document.createElement('div');
+      row.className = 'r-row disc';
+      row.innerHTML = `<span>${lbl}<\/span><span>−¥${amt.toLocaleString()}<\/span>`;
+      discRowsEl.appendChild(row);
+    });
+
+    // 外税計算：メニュー価格は税別単価
+    const subtotalExTax = baseTotal - totalDisc;   // 割引後の税別小計
+    const tax = Math.round(subtotalExTax * 0.1);   // 消費税10%
+    const after = subtotalExTax + tax;              // 税込合計
+    // Discount total row
+    const discTotalRow = document.getElementById('r-disc-total-row');
+    const discTotalEl = document.getElementById('r-disc-total');
+    if (discTotalRow) {
+      if (totalDisc > 0) {
+        discTotalRow.style.display = 'flex';
+        if (discTotalEl) discTotalEl.textContent = '−¥' + totalDisc.toLocaleString();
+      } else {
+        discTotalRow.style.display = 'none';
+      }
+    }
+    const rSub2 = document.getElementById('r-subtotal'); if (rSub2) rSub2.textContent = '¥' + subtotalExTax.toLocaleString();
+    const rTax = document.getElementById('r-tax'); if (rTax) rTax.textContent = '¥' + tax.toLocaleString();
+    const rTotal = document.getElementById('r-total'); if (rTotal) rTotal.textContent = '¥' + after.toLocaleString();
+
+    const nb = document.getElementById('r-notes-block');
+    if (nb) {
+      if (notes.trim()) { nb.style.display = 'block'; const nt = document.getElementById('r-notes-text'); if (nt) nt.textContent = notes; }
+      else { nb.style.display = 'none'; }
+    }
+  }
+
+  function startPriceEdit(key, currentPrice, basePrice, priceSpan) {
+    // Replace span with inline input
+    const inp = document.createElement('input');
+    inp.type = 'text';
+    inp.inputMode = 'numeric';
+    inp.pattern = '[0-9]*';
+    inp.value = currentPrice;
+    inp.className = 'r-price-input';
+    inp.setAttribute('inputmode', 'numeric');
+    priceSpan.replaceWith(inp);
+    inp.focus();
+    inp.select();
+
+    const commit = () => {
+      const v = parseInt(inp.value);
+      if (!isNaN(v) && v >= 0) {
+        if (v === basePrice) {
+          delete priceOverrides[key];
+        } else {
+          priceOverrides[key] = v;
+        }
+      }
+      updateReceipt();
+      renderDiscountsList();
+    };
+    inp.onblur = commit;
+    inp.onkeydown = e => {
+      if (e.key === 'Enter') { inp.blur(); }
+      if (e.key === 'Escape') { inp.value = currentPrice; inp.blur(); }
+    };
+  }
+
+  // ===== HISTORY =====
+  // ── メニュー・割引タブ切り替え ──
+  function switchReceiptTab(tab) {
+    document.getElementById('ri-tab-menu').classList.toggle('active', tab === 'menu');
+    document.getElementById('ri-tab-disc').classList.toggle('active', tab === 'disc');
+    document.getElementById('ri-panel-menu').style.display = tab === 'menu' ? 'block' : 'none';
+    document.getElementById('ri-panel-disc').style.display = tab === 'disc' ? 'block' : 'none';
+    if (tab === 'disc') renderDiscountsList();
+  }
+
+  const HIST_KEY = 'beauty_receipt_history';
+  const PDF_KEY  = 'beauty_salon_pdfs';
+
+  // ──
+  function renderPDFList() {} // 未使用
+
+  function loadHistory() {
+    try { return JSON.parse(localStorage.getItem(HIST_KEY) || '[]'); }
+    catch(e) { return []; }
+  }
+
+  function saveHistory(hist) {
+    localStorage.setItem(HIST_KEY, JSON.stringify(hist));
+  }
+
+  function saveToHistory() {
+    const allItems = getSelectedItems();
+    if (allItems.length === 0) {
+      alert('メニューが選択されていません');
+      return;
+    }
+    // Compute totals
+    let baseTotal = allItems.reduce((s, it) => s + it.price, 0);
+    let totalDisc = 0, remaining = baseTotal;
+    const discSnapshot = discounts.map(d => {
+      const tTotal = allItems.filter(it => d.targets.has(it.key)).reduce((s, it) => s + it.price, 0);
+      let amt = 0;
+      if (d.type === 'pct' && d.value > 0) amt = Math.round(tTotal * d.value / 100);
+      else if (d.type === 'yen' && d.value > 0) amt = Math.min(d.value, tTotal);
+      amt = Math.min(amt, remaining);
+      remaining -= amt;
+      totalDisc += amt;
+      return { label: d.label || (d.type === 'pct' ? d.value + '% 割引' : '割引'), amount: amt, type: d.type, value: d.value };
+    }).filter(d => d.amount > 0);
+    const finalTotal = baseTotal - totalDisc;
+
+    const record = {
+      id: Date.now(),
+      savedAt: new Date().toISOString(),
+      customerName: document.getElementById('customerName').value || 'お客様',
+      staffName: document.getElementById('staffName').value || settings.staffName,
+      visitDate: document.getElementById('visitDate').value,
+      notes: document.getElementById('notes').value,
+      items: allItems.map(it => ({ name: it.name, price: it.price })),
+      discounts: discSnapshot,
+      baseTotal,
+      totalDisc,
+      finalTotal,
+      // Full state for re-editing
+      selectedIds: [...selectedIds],
+      customItems: JSON.parse(JSON.stringify(customItems)),
+      priceOverrides: { ...priceOverrides },
+      discountsRaw: discounts.map(d => ({
+        id: d.id, type: d.type, value: d.value, label: d.label,
+        targets: [...d.targets]
+      })),
+    };
+
+    const hist = loadHistory();
+    hist.unshift(record);
+    saveHistory(hist);
+
+    // Show badge
+    const badge = document.getElementById('savedBadge');
+    badge.classList.add('show');
+    setTimeout(() => badge.classList.remove('show'), 2000);
+  }
+
+  function clearHistSearch() {
+    const inp = document.getElementById('histSearchInput');
+    if (inp) { inp.value = ''; }
+    renderHistoryList();
+  }
+
+  function renderHistoryList() {
+    const hist = loadHistory();
+    const container = document.getElementById('history-list');
+    const empty = document.getElementById('history-empty');
+    const noResult = document.getElementById('history-noresult');
+    const searchTerm = (document.getElementById('histSearchInput')?.value || '').trim();
+    const clearBtn = document.getElementById('histSearchClear');
+
+    // Show/hide clear button
+    if (clearBtn) clearBtn.style.display = searchTerm ? 'block' : 'none';
+
+    // Filter by customer name
+    const filtered = searchTerm
+      ? hist.filter(r => r.customerName && r.customerName.includes(searchTerm))
+      : hist;
+
+    container.innerHTML = '';
+    empty.style.display = (hist.length === 0 && !searchTerm) ? 'block' : 'none';
+    if (noResult) {
+      const noRes = filtered.length === 0 && searchTerm;
+      noResult.style.display = noRes ? 'block' : 'none';
+      const termEl = document.getElementById('hist-search-term');
+      if (termEl) termEl.textContent = searchTerm;
+    }
+    if (filtered.length === 0) return;
+
+    hist.forEach(rec => {
+      const card = document.createElement('div');
+      card.className = 'hist-card';
+
+      // Highlight matching text
+      const highlight = (text, term) => {
+        if (!term) return text;
+        const idx = text.indexOf(term);
+        if (idx < 0) return text;
+        return text.slice(0, idx) +
+          '<mark style="background:var(--gd-pale);color:var(--gd-dark);border-radius:3px;padding:0 2px;">' +
+          text.slice(idx, idx + term.length) + '<\/mark>' +
+          text.slice(idx + term.length);
+      };
+
+      // Saved date
+      const saved = new Date(rec.savedAt);
+      const savedStr = saved.toLocaleDateString('ja-JP', { month:'numeric', day:'numeric', hour:'2-digit', minute:'2-digit' }) + ' 保存';
+      // Visit date
+      let visitStr = '';
+      if (rec.visitDate) {
+        const d = new Date(rec.visitDate);
+        visitStr = d.getFullYear() + '年' + (d.getMonth()+1) + '月' + d.getDate() + '日';
+      }
+
+      card.innerHTML = `
+        <div class="hist-card-header">
+          <div class="hist-card-info">
+            <div class="hist-card-customer">${highlight(rec.customerName, searchTerm)} 様<\/div>
+            <div class="hist-card-date">${visitStr ? visitStr + '　' : ''}担当：${rec.staffName}　<span style="color:#c8b098;">${savedStr}<\/span><\/div>
+          <\/div>
+          <div class="hist-card-total">¥${rec.finalTotal.toLocaleString()}<\/div>
+        <\/div>
+        <div class="hist-card-items">${rec.items.slice(0, 5).map(it =>
+          `<span class="hist-tag">${it.name}<\/span>`).join('')}${rec.items.length > 5 ? `<span class="hist-tag">+${rec.items.length - 5}<\/span>` : ''}<\/div>
+        <div class="hist-card-footer">
+          <button class="hist-action-btn load" onclick="loadFromHistory(${rec.id})">📂 開いて編集<\/button>
+          <button class="hist-action-btn del" onclick="deleteHistory(${rec.id})">🗑 削除<\/button>
+        <\/div>`;
+      container.appendChild(card);
+    });
+  }
+
+  function loadFromHistory(id) {
+    const hist = loadHistory();
+    const rec = hist.find(r => r.id === id);
+    if (!rec) return;
+    if (!confirm(`「${rec.customerName}」の伝票を読み込みますか？
+現在の入力内容は上書きされます。`)) return;
+
+    // Restore state
+    selectedIds = new Set(rec.selectedIds || []);
+    customItems = rec.customItems || [];
+    priceOverrides = rec.priceOverrides || {};
+    customIdCtr = customItems.length > 0 ? Math.max(...customItems.map(i => i.id)) : 0;
+
+    // Restore discounts (targets as Set)
+    discounts = (rec.discountsRaw || []).map(d => ({
+      ...d,
+      targets: new Set(d.targets || [])
+    }));
+
+    // Restore form fields
+    document.getElementById('customerName').value = rec.customerName !== 'お客様' ? rec.customerName : '';
+    const staffInput = document.getElementById('staffName');
+    staffInput.value = rec.staffName || settings.staffName;
+    staffInput._userEdited = true;
+    document.getElementById('visitDate').value = rec.visitDate || '';
+    document.getElementById('notes').value = rec.notes || '';
+
+    // Re-render
+    renderMenuTabs();
+    renderDiscountsList();
+    updateReceipt();
+
+    // Switch to input page
+    const navBtn = document.querySelector('[data-page="page-input"]');
+    if (navBtn) switchPage(navBtn);
+  }
+
+  function deleteHistory(id) {
+    if (!confirm('この履歴を削除しますか？')) return;
+    const hist = loadHistory().filter(r => r.id !== id);
+    saveHistory(hist);
+    renderHistoryList();
+  }
+
+  function clearAllHistory() {
+    if (!confirm('全ての履歴を削除しますか？')) return;
+    saveHistory([]);
+    renderHistoryList();
+  }
+
+  function showReceiptPage() {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    const rp = document.getElementById('page-receipt');
+    if (rp) rp.classList.add('active');
+    const rn = document.querySelector('[data-page="page-receipt"]');
+    if (rn) rn.classList.add('active');
+  }
+
+  async function doPrint() {
+    showReceiptPage();
+
+    const badge = document.getElementById('savedBadge');
+    badge.textContent = '🖨 印刷準備中...';
+    badge.classList.add('show');
+
+    try {
+      const receiptCard = document.querySelector('.receipt-card');
+      const canvas = await html2canvas(receiptCard, {
+        scale: 3,
+        useCORS: true,
+        backgroundColor: '#f8f0e4',
+        logging: false,
+        allowTaint: true,
+      });
+
+      // 印刷用ウィンドウを開いて画像を表示
+      const imgData = canvas.toDataURL('image/png');
+      const printWin = window.open('', '_blank');
+      if (printWin) {
+        printWin.document.write(
+          '<!DOCTYPE html><html><head><title>印刷</title>' +
+          '<style>*{margin:0;padding:0;box-sizing:border-box;}' +
+          'body{display:flex;justify-content:center;align-items:flex-start;background:#fff;}' +
+          'img{max-width:100%;height:auto;display:block;}' +
+          '@media print{body{margin:0;}img{width:100%;}}' +
+          '</style></head><body>' +
+          '<img src="' + imgData + '" onload="window.print();window.close();">' +
+          '</body></html>'
+        );
+        printWin.document.close();
+        badge.textContent = '✓ 印刷ダイアログを開きました';
+      } else {
+        // ポップアップブロックされた場合はPDFとして保存
+        badge.textContent = '⚠ ポップアップがブロックされました';
+        setTimeout(() => {
+          badge.classList.remove('show');
+          alert('印刷ウィンドウがブロックされました。\nブラウザのポップアップを許可するか、PDF保存をご利用ください。');
+        }, 1000);
+        return;
+      }
+    } catch(e) {
+      console.error(e);
+      badge.textContent = '⚠ 印刷の準備に失敗しました';
+    }
+
+    setTimeout(() => badge.classList.remove('show'), 2500);
+  }
+
+
+  let resetPending = false;
+  let resetTimer = null;
+
+  function resetAll() {
+    if (!resetPending) {
+      resetPending = true;
+      const btn = document.querySelector('[onclick="resetAll()"]');
+      if (btn) { btn.textContent = '本当にリセット？'; btn.style.color = '#e08080'; }
+      resetTimer = setTimeout(() => {
+        resetPending = false;
+        const b = document.querySelector('[onclick="resetAll()"]');
+        if (b) { b.textContent = 'リセット'; b.style.color = ''; }
+      }, 2500);
+      return;
+    }
+    clearTimeout(resetTimer);
+    resetPending = false;
+    const btn = document.querySelector('[onclick="resetAll()"]');
+    if (btn) { btn.textContent = 'リセット'; btn.style.color = ''; }
+    selectedIds.clear(); customItems = []; discounts = []; priceOverrides = {};
+    ['customerName', 'notes'].forEach(id => document.getElementById(id).value = '');
+    const staffInput = document.getElementById('staffName');
+    staffInput.value = settings.staffName;
+    staffInput._userEdited = false;
+    document.getElementById('visitDate').value = new Date().toISOString().split('T')[0];
+    renderMenuTabs();
+    renderDiscountsList();
+    updateReceipt();
+  }
+
+  // ===== MENU EDITOR =====
+  function openMenuEditor() {
+    document.getElementById('editorOverlay').classList.add('open');
+    showCatList();
+  }
+
+  function closeEditor() {
+    document.getElementById('editorOverlay').classList.remove('open');
+    const allIds = new Set(menuData.flatMap(c => c.items.map(i => i.id)));
+    for (const id of selectedIds) { if (!allIds.has(id)) selectedIds.delete(id); }
+    if (!menuData.find(c => c.id === currentTab)) currentTab = menuData[0]?.id ?? 'custom';
+    renderMenuTabs();
+    renderDiscountsList();
+    updateReceipt();
+  }
+
+  function overlayClick(e) { if (e.target === document.getElementById('editorOverlay')) closeEditor(); }
+
+  function showCatList() {
+    document.getElementById('editorTitle').textContent = 'メニュー編集';
+    const body = document.getElementById('editorBody');
+    body.innerHTML = '';
+
+    const list = document.createElement('div');
+    list.className = 'modal-cats';
+    menuData.forEach(cat => {
+      const el = document.createElement('div');
+      el.className = 'modal-cat-item';
+      el.innerHTML = `<span class="modal-cat-name">${cat.name}<\/span><span class="modal-cat-count">${cat.items.length}件<\/span><span class="modal-cat-arrow">›<\/span>`;
+      el.onclick = () => showItemEditor(cat.id);
+      list.appendChild(el);
+    });
+    body.appendChild(list);
+
+    const addRow = document.createElement('div');
+    addRow.className = 'modal-cat-add';
+    const inp = document.createElement('input');
+    inp.placeholder = '新しいカテゴリ名'; inp.maxLength = 20;
+    inp.onkeydown = e => { if (e.key === 'Enter') doAddCat(inp); };
+    const btn = document.createElement('button');
+    btn.textContent = '追加';
+    btn.onclick = () => doAddCat(inp);
+    addRow.appendChild(inp); addRow.appendChild(btn);
+    body.appendChild(addRow);
+  }
+
+  function doAddCat(inp) {
+    const name = inp.value.trim();
+    if (!name) return;
+    menuData.push({ id: ++idCtr, name, items: [] });
+    inp.value = '';
+    showCatList();
+  }
+
+  function showItemEditor(catId) {
+    editorCatId = catId;
+    const cat = menuData.find(c => c.id === catId);
+    if (!cat) return;
+    document.getElementById('editorTitle').textContent = cat.name;
+    const body = document.getElementById('editorBody');
+    body.innerHTML = '';
+
+    const editor = document.createElement('div');
+    editor.className = 'item-editor';
+
+    // Header
+    const hdr = document.createElement('div');
+    hdr.className = 'item-editor-header';
+    const back = document.createElement('button');
+    back.className = 'back-btn'; back.textContent = '‹'; back.onclick = () => showCatList();
+    const ni = document.createElement('input');
+    ni.className = 'cat-name-inp'; ni.value = cat.name; ni.maxLength = 20;
+    ni.onchange = () => { if (ni.value.trim()) { cat.name = ni.value.trim(); document.getElementById('editorTitle').textContent = cat.name; } };
+    const delBtn = document.createElement('button');
+    delBtn.className = 'del-cat-btn'; delBtn.textContent = '削除';
+    delBtn.onclick = () => {
+      if (menuData.length <= 1) { alert('最低1つのカテゴリが必要です'); return; }
+      if (!confirm(`「${cat.name}」を削除しますか？`)) return;
+      cat.items.forEach(it => selectedIds.delete(it.id));
+      menuData = menuData.filter(c => c.id !== catId);
+      showCatList();
+    };
+    hdr.appendChild(back); hdr.appendChild(ni); hdr.appendChild(delBtn);
+    editor.appendChild(hdr);
+
+    // Items
+    const itemList = document.createElement('div');
+    itemList.className = 'item-list';
+    // Drag state
+    let dragSrcId = null;
+
+    const renderItems = () => {
+      itemList.innerHTML = '';
+      if (cat.items.length === 0) {
+        const msg = document.createElement('div'); msg.className = 'empty-msg'; msg.textContent = 'メニューがありません。下から追加してください。';
+        itemList.appendChild(msg);
+        return;
+      }
+      cat.items.forEach(item => {
+        const row = document.createElement('div');
+        row.className = 'editor-item';
+        row.dataset.id = item.id;
+
+        // ── Drag handle ──
+        const handle = document.createElement('span');
+        handle.className = 'drag-handle';
+        handle.innerHTML = '&#8942;&#8942;'; // ⋮⋮
+        handle.title = '長押しで並び替え';
+
+        // ── Desktop drag (draggable on whole row via handle) ──
+        row.draggable = true;
+        row.addEventListener('dragstart', e => {
+          dragSrcId = item.id;
+          row.classList.add('dragging');
+          e.dataTransfer.effectAllowed = 'move';
+        });
+        row.addEventListener('dragend', () => {
+          row.classList.remove('dragging');
+          itemList.querySelectorAll('.editor-item').forEach(r => r.classList.remove('drag-over'));
+        });
+        row.addEventListener('dragover', e => {
+          e.preventDefault();
+          e.dataTransfer.dropEffect = 'move';
+          itemList.querySelectorAll('.editor-item').forEach(r => r.classList.remove('drag-over'));
+          if (dragSrcId !== item.id) row.classList.add('drag-over');
+        });
+        row.addEventListener('drop', e => {
+          e.preventDefault();
+          if (dragSrcId === item.id) return;
+          const srcIdx = cat.items.findIndex(i => i.id === dragSrcId);
+          const dstIdx = cat.items.findIndex(i => i.id === item.id);
+          if (srcIdx < 0 || dstIdx < 0) return;
+          const [moved] = cat.items.splice(srcIdx, 1);
+          cat.items.splice(dstIdx, 0, moved);
+          renderItems();
+        });
+
+        // ── Touch drag (long-press on handle) ──
+        let touchItem = null, touchClone = null, touchStartY = 0, touchSrcId = null;
+        handle.addEventListener('touchstart', e => {
+          e.preventDefault();
+          touchSrcId = item.id;
+          touchStartY = e.touches[0].clientY;
+          row.classList.add('dragging');
+
+          // Create floating clone
+          const rect = row.getBoundingClientRect();
+          touchClone = row.cloneNode(true);
+          touchClone.style.cssText = [
+            'position:fixed', 'left:' + rect.left + 'px', 'top:' + rect.top + 'px',
+            'width:' + rect.width + 'px', 'opacity:0.85', 'z-index:999',
+            'pointer-events:none', 'border-radius:10px',
+            'box-shadow:0 8px 24px rgba(0,0,0,0.18)',
+            'background:white', 'transition:none'
+          ].join(';');
+          document.body.appendChild(touchClone);
+        }, { passive: false });
+
+        handle.addEventListener('touchmove', e => {
+          e.preventDefault();
+          if (!touchClone) return;
+          const dy = e.touches[0].clientY - touchStartY;
+          touchClone.style.transform = 'translateY(' + dy + 'px)';
+
+          // Find which row we're hovering over
+          const midY = e.touches[0].clientY;
+          itemList.querySelectorAll('.editor-item').forEach(r => {
+            r.classList.remove('drag-over');
+            const rr = r.getBoundingClientRect();
+            if (midY >= rr.top && midY <= rr.bottom && r.dataset.id != touchSrcId) {
+              r.classList.add('drag-over');
+            }
+          });
+        }, { passive: false });
+
+        handle.addEventListener('touchend', e => {
+          if (touchClone) { touchClone.remove(); touchClone = null; }
+          row.classList.remove('dragging');
+          const overRow = itemList.querySelector('.editor-item.drag-over');
+          if (overRow && overRow.dataset.id != touchSrcId) {
+            const srcIdx = cat.items.findIndex(i => i.id == touchSrcId);
+            const dstIdx = cat.items.findIndex(i => i.id == overRow.dataset.id);
+            if (srcIdx >= 0 && dstIdx >= 0) {
+              const [moved] = cat.items.splice(srcIdx, 1);
+              cat.items.splice(dstIdx, 0, moved);
+            }
+          }
+          itemList.querySelectorAll('.editor-item').forEach(r => r.classList.remove('drag-over'));
+          renderItems();
+        });
+
+        const nameI = document.createElement('input'); nameI.className = 'ei-name'; nameI.value = item.name; nameI.placeholder = 'メニュー名';
+        nameI.onchange = () => { if (nameI.value.trim()) item.name = nameI.value.trim(); };
+        const yen = document.createElement('span'); yen.className = 'ei-yen'; yen.textContent = '¥';
+        const priceI = document.createElement('input'); priceI.className = 'ei-price'; priceI.type = 'text'; priceI.inputMode = 'numeric'; priceI.pattern = '[0-9]*'; priceI.value = item.price;
+        priceI.onchange = () => { const v = parseInt(priceI.value.replace(/[^0-9]/g, '')); if (!isNaN(v) && v >= 0) item.price = v; else priceI.value = item.price; };
+        const del = document.createElement('button'); del.className = 'ei-del'; del.textContent = '×';
+        del.onclick = () => { selectedIds.delete(item.id); cat.items = cat.items.filter(i => i.id !== item.id); renderItems(); };
+
+        row.appendChild(handle); row.appendChild(nameI); row.appendChild(yen); row.appendChild(priceI); row.appendChild(del);
+        itemList.appendChild(row);
+      });
+    };
+    renderItems();
+    editor.appendChild(itemList);
+
+    // Add row
+    const addRow = document.createElement('div'); addRow.className = 'item-add-row';
+    const an = document.createElement('input'); an.className = 'ai-name'; an.placeholder = 'メニュー名';
+    const ap = document.createElement('input'); ap.className = 'ai-price'; ap.type = 'number'; ap.placeholder = '金額（税別）'; ap.min = '0';
+    const ab = document.createElement('button'); ab.textContent = '追加';
+    const doAdd = () => {
+      const name = an.value.trim(), price = parseInt(ap.value) || 0;
+      if (!name || price <= 0) { an.style.borderColor = 'var(--pk-pale)'; setTimeout(() => an.style.borderColor = '', 800); return; }
+      cat.items.push({ id: ++idCtr, name, price });
+      an.value = ''; ap.value = '';
+      renderItems();
+    };
+    ab.onclick = doAdd;
+    an.onkeydown = e => { if (e.key === 'Enter') doAdd(); };
+    ap.onkeydown = e => { if (e.key === 'Enter') doAdd(); };
+    addRow.appendChild(an); addRow.appendChild(ap); addRow.appendChild(ab);
+    editor.appendChild(addRow);
+
+    body.appendChild(editor);
+  }
+</script>
+  <div class="hist-saved-badge" id="savedBadge">✓ 履歴に保存しました</div>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        const loc = window.location;
+        const isProd = loc.protocol === 'https:' && !loc.hostname.includes('claudeusercontent');
+        if (isProd) {
+          navigator.serviceWorker.register('./sw.js').catch(() => {});
+        }
+      });
+    }
+  </script>
+</body>
+</html>
