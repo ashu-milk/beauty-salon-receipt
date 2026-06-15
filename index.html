@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, orientation=portrait">
   <title>Beauty Salon Receipt</title>
 
   <!-- PWA設定 -->
@@ -103,6 +103,24 @@
     .nav-btn svg { width: 22px; height: 22px; }
     .nav-btn.active { color: #e4d4a8; }
     .nav-btn.active svg { stroke: #e4d4a8; }
+
+    /* ── 縦長固定・横向き無効 ── */
+    @media screen and (orientation: landscape) {
+      body::before {
+        content: '画面を縦にしてください';
+        position: fixed; inset: 0; z-index: 99999;
+        background: #2c1e14;
+        color: #e4d4a8;
+        font-family: 'Shippori Mincho', serif;
+        font-size: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        letter-spacing: 0.15em;
+      }
+      body > * { display: none !important; }
+      body::before { display: flex !important; }
+    }
 
     /* ── RECEIPT INNER TABS ── */
     .receipt-inner-tabs {
