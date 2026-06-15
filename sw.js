@@ -1,4 +1,4 @@
-const CACHE_NAME = 'salon-receipt-v2';
+const CACHE_NAME = 'salon-receipt-v3';
 const ASSETS = [
   './index.html',
   './manifest.json',
