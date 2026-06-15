@@ -931,25 +931,41 @@
       });
       body.appendChild(preRow);
 
-      // Fields
-      const fields = document.createElement('div');
-      fields.className = 'disc-fields';
-      const vf = document.createElement('div'); vf.className = 'disc-field';
-      vf.innerHTML = `<label>${disc.type === 'pct' ? '割引率' : '割引額'}<\/label>`;
-      const vr = document.createElement('div'); vr.className = 'disc-val-row';
-      const vi = document.createElement('input'); vi.type = 'text'; vi.inputMode = 'numeric'; vi.pattern = '[0-9]*'; vi.placeholder = '0'; vi.value = disc.value || '';
+      // 割引率/額 入力（プリセットの下・横幅を狭く）
+      const vf = document.createElement('div');
+      vf.className = 'disc-field';
+      vf.style.cssText = 'flex-direction:row;align-items:center;gap:6px;';
+      const vlbl = document.createElement('label');
+      vlbl.textContent = disc.type === 'pct' ? '割引率' : '割引額';
+      vlbl.style.cssText = 'font-size:11px;color:var(--mid);white-space:nowrap;';
+      const vr = document.createElement('div');
+      vr.className = 'disc-val-row';
+      vr.style.cssText = 'flex:0 0 auto;';
+      const vi = document.createElement('input');
+      vi.type = 'text'; vi.inputMode = 'numeric'; vi.pattern = '[0-9]*';
+      vi.placeholder = '0'; vi.value = disc.value || '';
+      vi.style.cssText = 'width:52px;text-align:right;';
       vi.oninput = () => { disc.value = parseFloat(vi.value.replace(/[^0-9.]/g, '')) || 0; updateReceipt(); refreshSummary(card, disc, allItems); };
-      const vu = document.createElement('span'); vu.className = 'disc-unit'; vu.textContent = disc.type === 'pct' ? '%' : '円';
-      vr.appendChild(vi); vr.appendChild(vu); vf.appendChild(vr);
+      const vu = document.createElement('span');
+      vu.className = 'disc-unit';
+      vu.textContent = disc.type === 'pct' ? '%' : '円';
+      vr.appendChild(vi); vr.appendChild(vu);
+      vf.appendChild(vlbl); vf.appendChild(vr);
+      body.appendChild(vf);
+
+      // 割引名称
       const nf = document.createElement('div'); nf.className = 'disc-field';
-      nf.innerHTML = '<label>割引名称<\/label>';
+      const nlbl = document.createElement('label');
+      nlbl.textContent = '割引名称';
+      nlbl.style.cssText = 'font-size:11px;color:var(--mid);';
+      nf.appendChild(nlbl);
       const ni = document.createElement('input'); ni.className = 'disc-name-inp'; ni.placeholder = '例）会員割引'; ni.value = disc.label;
       ni.oninput = () => { disc.label = ni.value; updateReceipt(); refreshSummary(card, disc, allItems); };
       nf.appendChild(ni);
       // 名称プリセット
       const namePreRow = document.createElement('div');
       namePreRow.className = 'disc-presets';
-      namePreRow.style.marginTop = '8px';
+      namePreRow.style.marginTop = '6px';
       ['次回予約割引', '紹介割引', 'Tr.＆SPAセット割引', '50％OFF上限割引'].forEach(name => {
         const b = document.createElement('button');
         b.className = 'disc-pre';
@@ -958,8 +974,7 @@
         namePreRow.appendChild(b);
       });
       nf.appendChild(namePreRow);
-      fields.appendChild(vf); fields.appendChild(nf);
-      body.appendChild(fields);
+      body.appendChild(nf);
 
       // Targets
       const ts = document.createElement('div'); ts.className = 'disc-targets-sec';
