@@ -489,8 +489,6 @@
     </div>
   </div>
 
-  <!-- PAGE: DISCOUNT (後方互換用・非表示) -->
-  <div id="page-discount" style="display:none;"></div>
 
   <!-- PAGE: NOTES -->
   <textarea id="notes" style="display:none;"></textarea>
@@ -526,27 +524,6 @@
       </div>
     </div>
 
-    <!-- 履歴セクション -->
-    <div class="sec-header" style="margin-top:8px;">▸ 伝票履歴</div>
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:0 12px 8px;">
-      <div style="font-size:11px;color:#c8b898;"></div>
-      <button class="hist-clear-btn" onclick="clearAllHistory()">全て削除</button>
-    </div>
-    <div class="hist-search-wrap">
-      <div class="hist-search-box">
-        <svg class="hist-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>
-        <input type="text" id="histSearchInput" class="hist-search-input" placeholder="お客様名で検索..." oninput="renderHistoryList()">
-        <button class="hist-search-clear" id="histSearchClear" onclick="clearHistSearch()" style="display:none;">×</button>
-      </div>
-    </div>
-    <div id="history-list" style="padding:0 12px;display:flex;flex-direction:column;gap:10px;"></div>
-    <div id="history-empty" style="text-align:center;color:#c8b098;font-size:13px;padding:32px 24px;line-height:2;">
-      保存された伝票はありません<br>
-      <span style="font-size:11px;">伝票ページの「保存」ボタンで履歴に追加できます</span>
-    </div>
-    <div id="history-noresult" style="display:none;text-align:center;color:#c8b098;font-size:13px;padding:32px 24px;line-height:2;">
-      「<span id="hist-search-term"></span>」の検索結果はありません
-    </div>
   </div>
 
   <!-- PAGE: RECEIPT -->
@@ -1172,8 +1149,6 @@
   const HIST_KEY = 'beauty_receipt_history';
   const PDF_KEY  = 'beauty_salon_pdfs';
 
-  // ──
-  function renderPDFList() {} // 未使用
 
   function loadHistory() {
     try { return JSON.parse(localStorage.getItem(HIST_KEY) || '[]'); }
@@ -1414,7 +1389,6 @@
         return;
       }
     } catch(e) {
-      console.error(e);
       badge.textContent = '⚠ 印刷の準備に失敗しました';
     }
 
