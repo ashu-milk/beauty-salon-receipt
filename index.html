@@ -190,49 +190,49 @@
     .ci-del { border: none; background: none; color: #c8b098; font-size: 20px; padding: 0 4px; cursor: pointer; line-height: 1; }
 
     /* ── DISCOUNT ── */
-    .disc-section-hdr { display: flex; align-items: center; justify-content: space-between; padding: 20px 16px 12px; }
+    .disc-section-hdr { display: flex; align-items: center; justify-content: space-between; padding: 10px 8px 8px; }
     .disc-section-hdr .sec-label { font-size: 11px; letter-spacing: 0.2em; color: #e0cdb0; font-weight: 600; }
-    .btn-add-disc { display: flex; align-items: center; gap: 4px; padding: 7px 13px; border: 1px solid #c8b898; border-radius: 8px; background: rgba(228,212,168,0.15); color: #e0cdb0; font-size: 12px; cursor: pointer; font-family: 'Shippori Mincho', serif; font-weight: 500; }
+    .btn-add-disc { display: flex; align-items: center; gap: 4px; padding: 6px 10px; border: 1px solid #c8b898; border-radius: 8px; background: rgba(228,212,168,0.15); color: #e0cdb0; font-size: 11px; cursor: pointer; font-family: 'Shippori Mincho', serif; font-weight: 500; }
     .btn-add-disc:active { background: rgba(228,212,168,0.25); }
-    .discounts-list { display: flex; flex-direction: column; gap: 10px; padding: 0 12px; }
+    .discounts-list { display: flex; flex-direction: column; gap: 8px; padding: 0 8px; }
     .disc-card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
-    .disc-card-hdr { display: flex; align-items: center; gap: 8px; padding: 12px 14px; background: var(--gd-pale); border-bottom: 1px solid var(--line); cursor: pointer; }
+    .disc-card-hdr { display: flex; align-items: center; gap: 6px; padding: 9px 12px; background: var(--gd-pale); border-bottom: 1px solid var(--line); cursor: pointer; }
     .disc-toggle { font-size: 11px; color: var(--gd); transition: transform 0.2s; flex-shrink: 0; }
     .disc-card.collapsed .disc-toggle { transform: rotate(-90deg); }
     .disc-summary { flex: 1; font-size: 13px; color: var(--charcoal); }
     .disc-summary strong { color: var(--br); }
     .disc-del { border: none; background: none; font-size: 22px; color: var(--br-pale); padding: 0 4px; cursor: pointer; line-height: 1; }
-    .disc-body { padding: 14px; display: flex; flex-direction: column; gap: 14px; }
+    .disc-body { padding: 10px; display: flex; flex-direction: column; gap: 10px; }
     .disc-card.collapsed .disc-body { display: none; }
-    .disc-type-row { display: flex; gap: 8px; }
-    .disc-pill { flex: 1; padding: 9px 0; border: 1px solid var(--line); border-radius: 20px; background: var(--warm-white); font-size: 12px; cursor: pointer; font-family: 'Shippori Mincho', serif; color: var(--mid); text-align: center; transition: all 0.15s; }
+    .disc-type-row { display: flex; gap: 6px; }
+    .disc-pill { flex: 1; padding: 7px 0; border: 1px solid var(--line); border-radius: 20px; background: var(--warm-white); font-size: 11px; cursor: pointer; font-family: 'Shippori Mincho', serif; color: var(--mid); text-align: center; transition: all 0.15s; }
     .disc-pill.active { border-color: var(--gd-dark); background: var(--gd-light); color: var(--charcoal); font-weight: 600; }
-    .disc-presets { display: flex; flex-wrap: wrap; gap: 6px; }
-    .disc-pre { padding: 5px 12px; border: 1px solid var(--line); border-radius: 14px; background: var(--warm-white); font-size: 12px; cursor: pointer; font-family: 'Shippori Mincho', serif; color: var(--mid); }
+    .disc-presets { display: flex; flex-wrap: wrap; gap: 5px; }
+    .disc-pre { padding: 4px 9px; border: 1px solid var(--line); border-radius: 12px; background: var(--warm-white); font-size: 11px; cursor: pointer; font-family: 'Shippori Mincho', serif; color: var(--mid); }
     .disc-pre:active { border-color: var(--gold); color: var(--gold-dark); }
-    .disc-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: end; }
+    .disc-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; align-items: end; }
     .disc-field { display: flex; flex-direction: column; gap: 5px; }
     .disc-field label { font-size: 11px; color: var(--mid); letter-spacing: 0.1em; font-weight: 500; }
     .disc-val-row { display: flex; align-items: center; gap: 6px; }
-    .disc-val-row input { flex: 1; min-width: 0; background: transparent; border: none; border-bottom: 1px solid var(--line); padding: 8px 0; font-size: 18px; font-family: 'Shippori Mincho', serif; color: var(--charcoal); outline: none; }
+    .disc-val-row input { flex: 1; min-width: 0; background: transparent; border: none; border-bottom: 1px solid var(--line); padding: 6px 0; font-size: 16px; font-family: 'Shippori Mincho', serif; color: var(--charcoal); outline: none; }
     .disc-val-row input:focus { border-bottom-color: var(--pk); }
     .disc-unit { font-size: 14px; color: var(--br); font-family: 'Shippori Mincho', serif; }
-    .disc-name-inp { width: 100%; background: transparent; border: none; border-bottom: 1px solid var(--line); padding: 8px 0; font-size: 14px; font-family: 'Shippori Mincho', serif; color: var(--charcoal); outline: none; }
+    .disc-name-inp { width: 100%; background: transparent; border: none; border-bottom: 1px solid var(--line); padding: 6px 0; font-size: 13px; font-family: 'Shippori Mincho', serif; color: var(--charcoal); outline: none; }
     .disc-name-inp:focus { border-bottom-color: var(--gold); }
-    .disc-targets-sec { border-top: 1px solid var(--line); padding-top: 12px; }
-    .disc-targets-hdr { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+    .disc-targets-sec { border-top: 1px solid var(--line); padding-top: 8px; }
+    .disc-targets-hdr { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
     .disc-targets-lbl { font-size: 11px; color: #c8b898; letter-spacing: 0.1em; font-weight: 600; }
     .disc-targets-btns { display: flex; gap: 6px; }
-    .disc-mini-btn { font-size: 11px; color: var(--br); border: 1px solid var(--gd); border-radius: 10px; background: var(--gd-pale); padding: 3px 10px; cursor: pointer; font-family: 'Shippori Mincho', serif; }
-    .disc-targets-list { display: flex; flex-direction: column; gap: 6px; }
-    .dtarget-row { display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: var(--warm-white); border: 1px solid var(--line); border-radius: 8px; cursor: pointer; }
+    .disc-mini-btn { font-size: 10px; color: var(--br); border: 1px solid var(--gd); border-radius: 8px; background: var(--gd-pale); padding: 3px 8px; cursor: pointer; font-family: 'Shippori Mincho', serif; }
+    .disc-targets-list { display: flex; flex-direction: column; gap: 4px; }
+    .dtarget-row { display: flex; align-items: center; gap: 8px; padding: 7px 10px; background: var(--warm-white); border: 1px solid var(--line); border-radius: 8px; cursor: pointer; }
     .dtarget-row.checked { border-color: var(--gd-dark); background: var(--gd-pale); }
-    .dtarget-cb { width: 18px; height: 18px; border: 2px solid var(--line); border-radius: 4px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.15s; }
+    .dtarget-cb { width: 16px; height: 16px; border: 2px solid var(--line); border-radius: 4px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.15s; }
     .dtarget-row.checked .dtarget-cb { background: var(--gd); border-color: var(--gd); }
     .dtarget-cb svg { opacity: 0; }
     .dtarget-row.checked .dtarget-cb svg { opacity: 1; }
-    .dtarget-name { flex: 1; font-size: 13px; color: var(--charcoal); font-weight: 500; }
-    .dtarget-price { font-size: 12px; color: var(--br); font-family: 'Shippori Mincho', serif; font-weight: 600; }
+    .dtarget-name { flex: 1; font-size: 12px; color: var(--charcoal); font-weight: 500; }
+    .dtarget-price { font-size: 11px; color: var(--br); font-family: 'Shippori Mincho', serif; font-weight: 600; }
     .disc-no-items { font-size: 12px; color: var(--br-pale); padding: 4px 0; }
 
     /* ── RECEIPT PAGE ── */
