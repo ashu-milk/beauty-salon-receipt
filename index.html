@@ -2,16 +2,21 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, orientation=portrait">
   <title>Beauty Salon Receipt</title>
+
+  <!-- PWA設定 -->
   <link rel="manifest" href="./manifest.json">
   <meta name="theme-color" content="#3d2c1c">
-  <link rel="icon" type="image/svg+xml" sizes="192x192" href="./icon-192.svg">
-  <link rel="icon" type="image/svg+xml" sizes="512x512" href="./icon-512.svg">
-  <link rel="apple-touch-icon" href="./icon-192.svg">
+  <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="SalonReceipt">
+  <link rel="icon" type="image/svg+xml" sizes="192x192" href="./icon-192.svg">
+  <link rel="icon" type="image/svg+xml" sizes="512x512" href="./icon-512.svg">
+  <link rel="apple-touch-icon" href="./icon-192.svg">
+
+  <!-- Google Fonts（オンライン時のみ読み込み） -->
   <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@600;700&family=Noto+Sans+JP:wght@300;400;500&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -102,6 +107,43 @@
     .nav-btn.active { color: #e4d4a8; }
     .nav-btn.active svg { stroke: #e4d4a8; }
 
+    /* ── 縦長固定・横向き無効 ── */
+    @media screen and (orientation: landscape) {
+      body::before {
+        content: '画面を縦にしてください';
+        position: fixed; inset: 0; z-index: 99999;
+        background: #2c1e14;
+        color: #e4d4a8;
+        font-family: 'Shippori Mincho', serif;
+        font-size: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        letter-spacing: 0.15em;
+      }
+      body > * { display: none !important; }
+      body::before { display: flex !important; }
+    }
+
+    /* ── RECEIPT INNER TABS ── */
+    .receipt-inner-tabs {
+      display: flex;
+      border-bottom: 1px solid rgba(200,184,152,0.25);
+      background: transparent;
+      flex-shrink: 0;
+    }
+    .ri-tab {
+      flex: 1; padding: 13px 0; border: none; background: transparent;
+      font-family: 'Shippori Mincho', serif; font-size: 14px;
+      color: #8a7060; cursor: pointer; position: relative;
+      transition: color 0.2s; letter-spacing: 0.05em;
+    }
+    .ri-tab.active { color: #f5ede0; font-weight: 700; }
+    .ri-tab.active::after {
+      content: ''; position: absolute; bottom: -1px; left: 20%; right: 20%;
+      height: 2px; background: var(--gd-dark); border-radius: 1px;
+    }
+
     /* ── SECTION HEADER ── */
     .sec-header {
       padding: 20px 16px 12px;
@@ -169,49 +211,49 @@
     .ci-del { border: none; background: none; color: #c8b098; font-size: 20px; padding: 0 4px; cursor: pointer; line-height: 1; }
 
     /* ── DISCOUNT ── */
-    .disc-section-hdr { display: flex; align-items: center; justify-content: space-between; padding: 20px 16px 12px; }
+    .disc-section-hdr { display: flex; align-items: center; justify-content: space-between; padding: 10px 8px 8px; }
     .disc-section-hdr .sec-label { font-size: 11px; letter-spacing: 0.2em; color: #e0cdb0; font-weight: 600; }
-    .btn-add-disc { display: flex; align-items: center; gap: 4px; padding: 7px 13px; border: 1px solid #c8b898; border-radius: 8px; background: rgba(228,212,168,0.15); color: #e0cdb0; font-size: 12px; cursor: pointer; font-family: 'Shippori Mincho', serif; font-weight: 500; }
+    .btn-add-disc { display: flex; align-items: center; gap: 4px; padding: 6px 10px; border: 1px solid #c8b898; border-radius: 8px; background: rgba(228,212,168,0.15); color: #e0cdb0; font-size: 11px; cursor: pointer; font-family: 'Shippori Mincho', serif; font-weight: 500; }
     .btn-add-disc:active { background: rgba(228,212,168,0.25); }
-    .discounts-list { display: flex; flex-direction: column; gap: 10px; padding: 0 12px; }
+    .discounts-list { display: flex; flex-direction: column; gap: 8px; padding: 0 8px; }
     .disc-card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
-    .disc-card-hdr { display: flex; align-items: center; gap: 8px; padding: 12px 14px; background: var(--gd-pale); border-bottom: 1px solid var(--line); cursor: pointer; }
+    .disc-card-hdr { display: flex; align-items: center; gap: 6px; padding: 9px 12px; background: var(--gd-pale); border-bottom: 1px solid var(--line); cursor: pointer; }
     .disc-toggle { font-size: 11px; color: var(--gd); transition: transform 0.2s; flex-shrink: 0; }
     .disc-card.collapsed .disc-toggle { transform: rotate(-90deg); }
     .disc-summary { flex: 1; font-size: 13px; color: var(--charcoal); }
     .disc-summary strong { color: var(--br); }
     .disc-del { border: none; background: none; font-size: 22px; color: var(--br-pale); padding: 0 4px; cursor: pointer; line-height: 1; }
-    .disc-body { padding: 14px; display: flex; flex-direction: column; gap: 14px; }
+    .disc-body { padding: 10px; display: flex; flex-direction: column; gap: 10px; }
     .disc-card.collapsed .disc-body { display: none; }
-    .disc-type-row { display: flex; gap: 8px; }
-    .disc-pill { flex: 1; padding: 9px 0; border: 1px solid var(--line); border-radius: 20px; background: var(--warm-white); font-size: 12px; cursor: pointer; font-family: 'Shippori Mincho', serif; color: var(--mid); text-align: center; transition: all 0.15s; }
+    .disc-type-row { display: flex; gap: 6px; }
+    .disc-pill { flex: 1; padding: 7px 0; border: 1px solid var(--line); border-radius: 20px; background: var(--warm-white); font-size: 11px; cursor: pointer; font-family: 'Shippori Mincho', serif; color: var(--mid); text-align: center; transition: all 0.15s; }
     .disc-pill.active { border-color: var(--gd-dark); background: var(--gd-light); color: var(--charcoal); font-weight: 600; }
-    .disc-presets { display: flex; flex-wrap: wrap; gap: 6px; }
-    .disc-pre { padding: 5px 12px; border: 1px solid var(--line); border-radius: 14px; background: var(--warm-white); font-size: 12px; cursor: pointer; font-family: 'Shippori Mincho', serif; color: var(--mid); }
+    .disc-presets { display: flex; flex-wrap: wrap; gap: 5px; }
+    .disc-pre { padding: 4px 9px; border: 1px solid var(--line); border-radius: 12px; background: var(--warm-white); font-size: 11px; cursor: pointer; font-family: 'Shippori Mincho', serif; color: var(--mid); }
     .disc-pre:active { border-color: var(--gold); color: var(--gold-dark); }
-    .disc-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: end; }
+    .disc-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; align-items: end; }
     .disc-field { display: flex; flex-direction: column; gap: 5px; }
     .disc-field label { font-size: 11px; color: var(--mid); letter-spacing: 0.1em; font-weight: 500; }
     .disc-val-row { display: flex; align-items: center; gap: 6px; }
-    .disc-val-row input { flex: 1; min-width: 0; background: transparent; border: none; border-bottom: 1px solid var(--line); padding: 8px 0; font-size: 18px; font-family: 'Shippori Mincho', serif; color: var(--charcoal); outline: none; }
+    .disc-val-row input { flex: 1; min-width: 0; background: transparent; border: none; border-bottom: 1px solid var(--line); padding: 6px 0; font-size: 16px; font-family: 'Shippori Mincho', serif; color: var(--charcoal); outline: none; }
     .disc-val-row input:focus { border-bottom-color: var(--pk); }
     .disc-unit { font-size: 14px; color: var(--br); font-family: 'Shippori Mincho', serif; }
-    .disc-name-inp { width: 100%; background: transparent; border: none; border-bottom: 1px solid var(--line); padding: 8px 0; font-size: 14px; font-family: 'Shippori Mincho', serif; color: var(--charcoal); outline: none; }
+    .disc-name-inp { width: 100%; background: transparent; border: none; border-bottom: 1px solid var(--line); padding: 6px 0; font-size: 13px; font-family: 'Shippori Mincho', serif; color: var(--charcoal); outline: none; }
     .disc-name-inp:focus { border-bottom-color: var(--gold); }
-    .disc-targets-sec { border-top: 1px solid var(--line); padding-top: 12px; }
-    .disc-targets-hdr { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+    .disc-targets-sec { border-top: 1px solid var(--line); padding-top: 8px; }
+    .disc-targets-hdr { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
     .disc-targets-lbl { font-size: 11px; color: #c8b898; letter-spacing: 0.1em; font-weight: 600; }
     .disc-targets-btns { display: flex; gap: 6px; }
-    .disc-mini-btn { font-size: 11px; color: var(--br); border: 1px solid var(--gd); border-radius: 10px; background: var(--gd-pale); padding: 3px 10px; cursor: pointer; font-family: 'Shippori Mincho', serif; }
-    .disc-targets-list { display: flex; flex-direction: column; gap: 6px; }
-    .dtarget-row { display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: var(--warm-white); border: 1px solid var(--line); border-radius: 8px; cursor: pointer; }
+    .disc-mini-btn { font-size: 10px; color: var(--br); border: 1px solid var(--gd); border-radius: 8px; background: var(--gd-pale); padding: 3px 8px; cursor: pointer; font-family: 'Shippori Mincho', serif; }
+    .disc-targets-list { display: flex; flex-direction: column; gap: 4px; }
+    .dtarget-row { display: flex; align-items: center; gap: 8px; padding: 7px 10px; background: var(--warm-white); border: 1px solid var(--line); border-radius: 8px; cursor: pointer; }
     .dtarget-row.checked { border-color: var(--gd-dark); background: var(--gd-pale); }
-    .dtarget-cb { width: 18px; height: 18px; border: 2px solid var(--line); border-radius: 4px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.15s; }
+    .dtarget-cb { width: 16px; height: 16px; border: 2px solid var(--line); border-radius: 4px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.15s; }
     .dtarget-row.checked .dtarget-cb { background: var(--gd); border-color: var(--gd); }
     .dtarget-cb svg { opacity: 0; }
     .dtarget-row.checked .dtarget-cb svg { opacity: 1; }
-    .dtarget-name { flex: 1; font-size: 13px; color: var(--charcoal); font-weight: 500; }
-    .dtarget-price { font-size: 12px; color: var(--br); font-family: 'Shippori Mincho', serif; font-weight: 600; }
+    .dtarget-name { flex: 1; font-size: 12px; color: var(--charcoal); font-weight: 500; }
+    .dtarget-price { font-size: 11px; color: var(--br); font-family: 'Shippori Mincho', serif; font-weight: 600; }
     .disc-no-items { font-size: 12px; color: var(--br-pale); padding: 4px 0; }
 
     /* ── RECEIPT PAGE ── */
@@ -429,59 +471,46 @@
 <!-- TOP HEADER -->
 <div class="top-header">
   <div class="top-header-title">Beauty Salon Receipt</div>
-  <div class="top-header-right">
-    <button class="hdr-btn" onclick="openMenuEditor()">メニュー編集</button>
-  </div>
+  <div class="top-header-right"></div>
 </div>
 
 <!-- PAGES -->
 <div class="pages">
 
-  <!-- PAGE: INPUT -->
+  <!-- PAGE: INPUT (メニュー＋割引タブ統合) -->
   <div class="page active" id="page-input">
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 16px 0;">
-      <div class="sec-header" style="padding:0;">▸ お客様情報</div>
-      <button class="hdr-btn" style="background:white;border-color:var(--line);color:var(--mid);font-size:11px;" onclick="openMenuEditor()">⚙ メニュー編集</button>
-    </div>
-    <div class="card" style="margin-top:10px;">
-      <div class="field-row">
-        <label>お名前</label>
-        <input type="text" id="customerName" placeholder="山田 花子 様" oninput="updateReceipt()">
-      </div>
-      <div class="field-row" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;border-bottom:none;">
-        <div>
-          <label style="font-size:10px;color:var(--mid);letter-spacing:0.1em;">担当スタッフ</label>
-          <input type="text" id="staffName" placeholder="柳生" oninput="this._userEdited=true;updateReceipt()" style="display:block;width:100%;background:transparent;border:none;font-size:16px;font-family:'Shippori Mincho',serif;color:#2c1e14;outline:none;padding:2px 0;">
-        </div>
-        <div>
-          <label style="font-size:10px;color:var(--mid);letter-spacing:0.1em;">来店日</label>
-          <input type="date" id="visitDate" oninput="updateReceipt()" style="display:block;width:100%;background:transparent;border:none;font-size:14px;font-family:'Shippori Mincho',serif;color:#2c1e14;outline:none;padding:2px 0;">
-        </div>
-      </div>
+
+    <!-- hidden inputs for compatibility -->
+    <input type="hidden" id="customerName" value="">
+    <input type="hidden" id="staffName" value="">
+    <input type="hidden" id="visitDate" value="">
+
+    <!-- タブ -->
+    <div class="receipt-inner-tabs">
+      <button class="ri-tab active" id="ri-tab-menu" onclick="switchReceiptTab('menu')">メニュー</button>
+      <button class="ri-tab" id="ri-tab-disc" onclick="switchReceiptTab('disc')">％ 割引</button>
     </div>
 
-    <div class="sec-header">▸ メニュー選択</div>
-    <div class="menu-tabs-wrap"><div class="menu-tabs" id="menuTabs"></div></div>
-    <div class="menu-panels" id="menuPanels"></div>
+    <!-- メニューパネル -->
+    <div id="ri-panel-menu">
+      <div class="menu-tabs-wrap"><div class="menu-tabs" id="menuTabs"></div></div>
+      <div class="menu-panels" id="menuPanels"></div>
+    </div>
+
+    <!-- 割引パネル -->
+    <div id="ri-panel-disc" style="display:none;">
+      <div class="disc-section-hdr">
+        <div class="sec-label">▸ 割引設定</div>
+        <button class="btn-add-disc" onclick="addDiscount()">＋ 割引を追加</button>
+      </div>
+      <div id="discounts-list" class="discounts-list"></div>
+      <div id="discounts-empty" style="font-size:13px;color:#d0a0b8;text-align:center;padding:32px 16px;">「＋ 割引を追加」で割引を設定できます</div>
+    </div>
   </div>
 
-  <!-- PAGE: DISCOUNT -->
-  <div class="page" id="page-discount">
-    <div class="disc-section-hdr">
-      <div class="sec-label">▸ 割引設定</div>
-      <button class="btn-add-disc" onclick="addDiscount()">＋ 割引を追加</button>
-    </div>
-    <div id="discounts-list" class="discounts-list"></div>
-    <div id="discounts-empty" style="font-size:13px;color:#d0a0b8;text-align:center;padding:32px 16px;">「＋ 割引を追加」で割引を設定できます</div>
-  </div>
 
   <!-- PAGE: NOTES -->
-  <div class="page" id="page-notes">
-    <div class="sec-header">▸ 備考</div>
-    <div class="notes-card">
-      <textarea id="notes" placeholder="施術メモ・次回予約など..." oninput="updateReceipt()" rows="6"></textarea>
-    </div>
-  </div>
+  <textarea id="notes" style="display:none;"></textarea>
 
   <!-- PAGE: SETTINGS -->
   <div class="page" id="page-settings">
@@ -513,16 +542,19 @@
         <button class="hdr-btn" style="background:var(--cream);border-color:var(--line);color:var(--mid);" onclick="openMenuEditor()">編集を開く</button>
       </div>
     </div>
+
   </div>
 
   <!-- PAGE: RECEIPT -->
   <div class="page" id="page-receipt">
     <div class="receipt-card">
       <div class="r-salon" id="r-salon">BEAUTY SALON</div>
-      <div class="r-sub" id="r-sub">ご来店ありがとうございます</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+        <div class="r-sub" id="r-sub" style="margin-bottom:0;">ご来店ありがとうございます</div>
+        <div id="r-staff" style="font-size:12px;color:var(--mid);font-family:'Shippori Mincho',serif;white-space:nowrap;"></div>
+      </div>
       <hr class="r-divider">
-      <div class="r-meta"><span id="r-date">—</span><span id="r-staff">担当：—</span></div>
-      <div class="r-customer" id="r-customer">お客様</div>
+      <div id="r-date" style="text-align:center;font-size:12px;color:var(--mid);font-family:'Shippori Mincho',serif;letter-spacing:0.1em;padding:4px 0 8px;"></div>
       <hr class="r-divider">
       <div class="r-items" id="r-items"><div class="r-empty">メニューを選択してください</div></div>
       <div class="r-totals">
@@ -531,19 +563,14 @@
         <div class="r-row disc r-disc-total" id="r-disc-total-row" style="display:none;border-top:1px solid #a8d8bc;padding-top:10px;">
           <span>割引合計</span><span id="r-disc-total">−¥0</span>
         </div>
-        <div class="r-row"><span>税抜小計</span><span id="r-subtotal">¥0</span></div>
+        <div class="r-row"><span>小計</span><span id="r-subtotal">¥0</span></div>
         <div class="r-row tax"><span>消費税（10%）</span><span id="r-tax">¥0</span></div>
         <div class="r-grand">
           <div class="r-grand-label">合計（税込）</div>
           <div class="r-grand-amount" id="r-total">¥0</div>
         </div>
       </div>
-      <div id="r-notes-block" style="display:none;">
-        <div class="r-notes">
-          <div class="r-notes-lbl">備考</div>
-          <div class="r-notes-text" id="r-notes-text"></div>
-        </div>
-      </div>
+
     </div>
     <div class="receipt-actions" style="grid-template-columns:1fr 1fr;">
       <button class="act-btn ghost span2" onclick="resetAll()">リセット</button>
@@ -583,27 +610,17 @@
 
 <!-- BOTTOM NAV -->
 <div class="bottom-nav">
+  <button class="nav-btn" data-page="page-receipt" onclick="switchPage(this);updateReceipt()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#c0a0a8" stroke-width="1.8"><path d="M4 4h16v16H4z"/><line x1="8" y1="9" x2="16" y2="9"/><line x1="8" y1="13" x2="13" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/></svg>
+    見積伝票
+  </button>
   <button class="nav-btn active" data-page="page-input" onclick="switchPage(this)">
     <svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,220,210,0.55)" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="3"/><line x1="8" y1="9" x2="16" y2="9"/><line x1="8" y1="13" x2="14" y2="13"/></svg>
     メニュー
   </button>
-  <button class="nav-btn" data-page="page-discount" onclick="switchPage(this)">
-    <svg viewBox="0 0 24 24" fill="none" stroke="#c0a0a8" stroke-width="1.8"><circle cx="9" cy="9" r="3"/><circle cx="15" cy="15" r="3"/><line x1="6" y1="18" x2="18" y2="6"/></svg>
-    割引
-  </button>
-  <button class="nav-btn" data-page="page-notes" onclick="switchPage(this)">
-    <svg viewBox="0 0 24 24" fill="none" stroke="#c0a0a8" stroke-width="1.8"><path d="M12 20h9"/><path d="M16.5 3.5l4 4L7 21H3v-4z"/></svg>
-    備考
-  </button>
-  <button class="nav-btn" data-page="page-receipt" onclick="switchPage(this)">
-    <svg viewBox="0 0 24 24" fill="none" stroke="#c0a0a8" stroke-width="1.8"><path d="M4 4h16v16H4z"/><line x1="8" y1="9" x2="16" y2="9"/><line x1="8" y1="13" x2="13" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/></svg>
-    伝票
-  </button>
-  <button class="nav-btn" data-page="page-history" onclick="switchPage(this);renderHistoryList()">
-    <svg viewBox="0 0 24 24" fill="none" stroke="#c0a0a8" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
-    履歴
-  </button>
-  <button class="nav-btn" data-page="page-settings" onclick="switchPage(this)">
+
+
+  <button class="nav-btn" data-page="page-settings" onclick="switchPage(this);renderHistoryList()">
     <svg viewBox="0 0 24 24" fill="none" stroke="#c0a0a8" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
     設定
   </button>
@@ -674,8 +691,10 @@
   let customIdCtr = 0;
   let currentTab = 1;
   let idCtr = 2000;
-  let discounts = [];
-  let discIdCtr = 0;
+  let discounts = [
+    { id: 1, type: 'pct', value: 0, label: '', targets: new Set(), targetsCleared: false, collapsed: false }
+  ];
+  let discIdCtr = 1;
   let editorCatId = null;
   let priceOverrides = {}; // key -> overridden price
   let settings = {
@@ -685,7 +704,7 @@
   };
 
   // ===== INIT =====
-  document.getElementById('visitDate').valueAsDate = new Date();
+  document.getElementById('visitDate').value = new Date().toISOString().split('T')[0];
   // Apply saved settings to fields
   document.getElementById('staffName').value = settings.staffName;
   document.getElementById('settingSalonName').value = settings.salonName;
@@ -901,7 +920,7 @@
       // Presets
       const preRow = document.createElement('div');
       preRow.className = 'disc-presets';
-      (disc.type === 'pct' ? [5,10,15,20,30] : [500,1000,2000,3000,5000]).forEach(v => {
+      (disc.type === 'pct' ? [10,25,30,50] : [1000,2000,7500]).forEach(v => {
         const b = document.createElement('button');
         b.className = 'disc-pre';
         b.textContent = disc.type === 'pct' ? v + '%' : '¥' + v.toLocaleString();
@@ -910,23 +929,50 @@
       });
       body.appendChild(preRow);
 
-      // Fields
-      const fields = document.createElement('div');
-      fields.className = 'disc-fields';
-      const vf = document.createElement('div'); vf.className = 'disc-field';
-      vf.innerHTML = `<label>${disc.type === 'pct' ? '割引率' : '割引額'}<\/label>`;
-      const vr = document.createElement('div'); vr.className = 'disc-val-row';
-      const vi = document.createElement('input'); vi.type = 'text'; vi.inputMode = 'numeric'; vi.pattern = '[0-9]*'; vi.placeholder = '0'; vi.value = disc.value || '';
+      // 割引率/額 入力（プリセットの下・横幅を狭く）
+      const vf = document.createElement('div');
+      vf.className = 'disc-field';
+      vf.style.cssText = 'flex-direction:row;align-items:center;gap:6px;';
+      const vlbl = document.createElement('label');
+      vlbl.textContent = disc.type === 'pct' ? '割引率' : '割引額';
+      vlbl.style.cssText = 'font-size:11px;color:var(--mid);white-space:nowrap;';
+      const vr = document.createElement('div');
+      vr.className = 'disc-val-row';
+      vr.style.cssText = 'flex:0 0 auto;';
+      const vi = document.createElement('input');
+      vi.type = 'text'; vi.inputMode = 'numeric'; vi.pattern = '[0-9]*';
+      vi.placeholder = '0'; vi.value = disc.value || '';
+      vi.style.cssText = 'width:52px;text-align:right;';
       vi.oninput = () => { disc.value = parseFloat(vi.value.replace(/[^0-9.]/g, '')) || 0; updateReceipt(); refreshSummary(card, disc, allItems); };
-      const vu = document.createElement('span'); vu.className = 'disc-unit'; vu.textContent = disc.type === 'pct' ? '%' : '円';
-      vr.appendChild(vi); vr.appendChild(vu); vf.appendChild(vr);
+      const vu = document.createElement('span');
+      vu.className = 'disc-unit';
+      vu.textContent = disc.type === 'pct' ? '%' : '円';
+      vr.appendChild(vi); vr.appendChild(vu);
+      vf.appendChild(vlbl); vf.appendChild(vr);
+      body.appendChild(vf);
+
+      // 割引名称
       const nf = document.createElement('div'); nf.className = 'disc-field';
-      nf.innerHTML = '<label>割引名称<\/label>';
+      const nlbl = document.createElement('label');
+      nlbl.textContent = '割引名称';
+      nlbl.style.cssText = 'font-size:11px;color:var(--mid);';
+      nf.appendChild(nlbl);
       const ni = document.createElement('input'); ni.className = 'disc-name-inp'; ni.placeholder = '例）会員割引'; ni.value = disc.label;
       ni.oninput = () => { disc.label = ni.value; updateReceipt(); refreshSummary(card, disc, allItems); };
       nf.appendChild(ni);
-      fields.appendChild(vf); fields.appendChild(nf);
-      body.appendChild(fields);
+      // 名称プリセット
+      const namePreRow = document.createElement('div');
+      namePreRow.className = 'disc-presets';
+      namePreRow.style.marginTop = '6px';
+      ['次回予約割引', '紹介割引', 'Tr.＆SPAセット割引', '50％OFF上限割引'].forEach(name => {
+        const b = document.createElement('button');
+        b.className = 'disc-pre';
+        b.textContent = name;
+        b.onclick = () => { disc.label = name; ni.value = name; updateReceipt(); refreshSummary(card, disc, allItems); };
+        namePreRow.appendChild(b);
+      });
+      nf.appendChild(namePreRow);
+      body.appendChild(nf);
 
       // Targets
       const ts = document.createElement('div'); ts.className = 'disc-targets-sec';
@@ -973,20 +1019,35 @@
 
   // ===== RECEIPT =====
   function updateReceipt() {
-    const name = document.getElementById('customerName').value || 'お客様';
-    const staff = document.getElementById('staffName').value || settings.staffName || '—';
-    const dateVal = document.getElementById('visitDate').value;
     const notes = document.getElementById('notes').value;
-    let dateStr = '—';
-    if (dateVal) { const d = new Date(dateVal); dateStr = `${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日`; }
     // Update salon info from settings
     const rSalon = document.getElementById('r-salon');
     const rSub = document.getElementById('r-sub');
     if (rSalon) rSalon.textContent = settings.salonName;
     if (rSub) rSub.textContent = settings.salonSub;
-    document.getElementById('r-date').textContent = dateStr;
-    document.getElementById('r-staff').textContent = '担当：' + staff;
-    document.getElementById('r-customer').textContent = name + ' 様';
+    const rStaff = document.getElementById('r-staff');
+    if (rStaff) {
+      const staffName = document.getElementById('staffName').value || settings.staffName || '';
+      rStaff.textContent = staffName ? '担当：' + staffName : '';
+    }
+    // 日付表示（来店日が設定されていればその日付、なければスマホの内蔵時計を使用）
+    const rDate = document.getElementById('r-date');
+    if (rDate) {
+      const visitDateVal = document.getElementById('visitDate').value;
+      const wdays = ['日', '月', '火', '水', '木', '金', '土'];
+      let dt;
+      if (visitDateVal) {
+        const p = visitDateVal.split('-').map(Number);
+        dt = new Date(p[0], p[1] - 1, p[2]);
+      } else {
+        dt = new Date();
+      }
+      const y = dt.getFullYear();
+      const m = dt.getMonth() + 1;
+      const d = dt.getDate();
+      const w = wdays[dt.getDay()];
+      rDate.textContent = y + '年' + m + '月' + d + '日（' + w + '）';
+    }
 
     const allItems = getSelectedItems();
     const container = document.getElementById('r-items');
@@ -1043,32 +1104,38 @@
       discRowsEl.appendChild(row);
     });
 
-    const subtotalExTax = baseTotal - totalDisc;
-    const tax = Math.round(subtotalExTax * 0.1);
-    const grandTotal = subtotalExTax + tax;
+    // 外税計算：メニュー価格は税別単価
+    const subtotalExTax = baseTotal - totalDisc;   // 割引後の税別小計
+    const tax = Math.round(subtotalExTax * 0.1);   // 消費税10%
+    const after = subtotalExTax + tax;              // 税込合計
     // Discount total row
     const discTotalRow = document.getElementById('r-disc-total-row');
     const discTotalEl = document.getElementById('r-disc-total');
-    if (totalDisc > 0) {
-      discTotalRow.style.display = 'flex';
-      discTotalEl.textContent = '−¥' + totalDisc.toLocaleString();
-    } else {
-      discTotalRow.style.display = 'none';
+    if (discTotalRow) {
+      if (totalDisc > 0) {
+        discTotalRow.style.display = 'flex';
+        if (discTotalEl) discTotalEl.textContent = '−¥' + totalDisc.toLocaleString();
+      } else {
+        discTotalRow.style.display = 'none';
+      }
     }
-    document.getElementById('r-subtotal').textContent = '¥' + subtotalExTax.toLocaleString();
-    document.getElementById('r-tax').textContent = '¥' + tax.toLocaleString();
-    document.getElementById('r-total').textContent = '¥' + grandTotal.toLocaleString();
+    const rSub2 = document.getElementById('r-subtotal'); if (rSub2) rSub2.textContent = '¥' + subtotalExTax.toLocaleString();
+    const rTax = document.getElementById('r-tax'); if (rTax) rTax.textContent = '¥' + tax.toLocaleString();
+    const rTotal = document.getElementById('r-total'); if (rTotal) rTotal.textContent = '¥' + after.toLocaleString();
 
     const nb = document.getElementById('r-notes-block');
-    if (notes.trim()) { nb.style.display = 'block'; document.getElementById('r-notes-text').textContent = notes; }
-    else { nb.style.display = 'none'; }
+    if (nb) {
+      if (notes.trim()) { nb.style.display = 'block'; const nt = document.getElementById('r-notes-text'); if (nt) nt.textContent = notes; }
+      else { nb.style.display = 'none'; }
+    }
   }
 
   function startPriceEdit(key, currentPrice, basePrice, priceSpan) {
     // Replace span with inline input
     const inp = document.createElement('input');
-    inp.type = 'number';
-    inp.min = '0';
+    inp.type = 'text';
+    inp.inputMode = 'numeric';
+    inp.pattern = '[0-9]*';
     inp.value = currentPrice;
     inp.className = 'r-price-input';
     inp.setAttribute('inputmode', 'numeric');
@@ -1096,7 +1163,17 @@
   }
 
   // ===== HISTORY =====
+  // ── メニュー・割引タブ切り替え ──
+  function switchReceiptTab(tab) {
+    document.getElementById('ri-tab-menu').classList.toggle('active', tab === 'menu');
+    document.getElementById('ri-tab-disc').classList.toggle('active', tab === 'disc');
+    document.getElementById('ri-panel-menu').style.display = tab === 'menu' ? 'block' : 'none';
+    document.getElementById('ri-panel-disc').style.display = tab === 'disc' ? 'block' : 'none';
+    if (tab === 'disc') renderDiscountsList();
+  }
+
   const HIST_KEY = 'beauty_receipt_history';
+
 
   function loadHistory() {
     try { return JSON.parse(localStorage.getItem(HIST_KEY) || '[]'); }
@@ -1297,6 +1374,8 @@
     if (rn) rn.classList.add('active');
   }
 
+
+
   let resetPending = false;
   let resetTimer = null;
 
@@ -1316,12 +1395,14 @@
     resetPending = false;
     const btn = document.querySelector('[onclick="resetAll()"]');
     if (btn) { btn.textContent = 'リセット'; btn.style.color = ''; }
-    selectedIds.clear(); customItems = []; discounts = []; priceOverrides = {};
+    selectedIds.clear(); customItems = []; priceOverrides = {};
+    discIdCtr = 1;
+    discounts = [{ id: 1, type: 'pct', value: 0, label: '', targets: new Set(), targetsCleared: false, collapsed: false }];
     ['customerName', 'notes'].forEach(id => document.getElementById(id).value = '');
     const staffInput = document.getElementById('staffName');
     staffInput.value = settings.staffName;
     staffInput._userEdited = false;
-    document.getElementById('visitDate').valueAsDate = new Date();
+    document.getElementById('visitDate').value = new Date().toISOString().split('T')[0];
     renderMenuTabs();
     renderDiscountsList();
     updateReceipt();
@@ -1558,9 +1639,11 @@
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js').catch(err => {
-          console.error('Service Worker registration failed:', err);
-        });
+        const loc = window.location;
+        const isProd = loc.protocol === 'https:' && !loc.hostname.includes('claudeusercontent');
+        if (isProd) {
+          navigator.serviceWorker.register('./sw.js').catch(() => {});
+        }
       });
     }
   </script>
